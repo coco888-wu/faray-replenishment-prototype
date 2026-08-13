@@ -1565,8 +1565,8 @@
       <div class="top-actions">
         <button class="button small" id="openImportTop" type="button"><i data-lucide="upload" class="icon"></i>导入</button>
         <button class="button small" id="openSyncTop" type="button"><i data-lucide="refresh-cw" class="icon"></i>同步队列</button>
-        <button class="icon-button" type="button" title="通知"><i data-lucide="bell" class="icon"></i></button>
-        <button class="icon-button" type="button" title="当前角色：运营主管"><i data-lucide="user-round" class="icon"></i></button>
+        <button class="icon-button" type="button" title="通知" data-toast="当前没有新的系统通知"><i data-lucide="bell" class="icon"></i></button>
+        <button class="icon-button" type="button" title="当前角色：运营主管" data-toast="当前角色：运营主管。原型仅模拟权限视角。"><i data-lucide="user-round" class="icon"></i></button>
       </div>
     </header>
 
@@ -2123,7 +2123,7 @@
             <div class="toolbar-right">
               <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户预览</button>
               <button class="button small" type="button" data-export="supplierPo">导出</button>
-              <button class="button small" type="button" data-toast="已向未上传供应商发送提醒">提醒上传</button>
+              <button class="button small" type="button" data-supplier-action="remind">提醒上传</button>
               <button class="button small blue" type="button" id="openSnIssueModal">发放 S/N</button>
             </div>
           </div>
@@ -2173,7 +2173,7 @@
             </div>
             <div class="toolbar-right">
               <button class="button" type="button" data-export="snUploadExceptions"><i data-lucide="download" class="icon"></i>导出异常</button>
-              <button class="button blue" type="button" data-toast="已提交选中异常进入审核处理"><i data-lucide="check" class="icon"></i>批量审核</button>
+              <button class="button blue" type="button" data-supplier-action="review-exceptions"><i data-lucide="check" class="icon"></i>批量审核</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -2205,7 +2205,7 @@
             </div>
             <div class="toolbar-right">
               <button class="button" type="button" data-export="snRegistry"><i data-lucide="download" class="icon"></i>导出主档</button>
-              <button class="button small" type="button" data-toast="已打开售后查询视图">售后查询</button>
+              <button class="button small" type="button" data-supplier-action="after-sales">售后查询</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -2239,8 +2239,8 @@
               <div class="panel-subtitle">维护供应商账号、可见 PO 和门户操作范围。</div>
             </div>
             <div class="toolbar-right">
-              <button class="button small" type="button" data-toast="已创建供应商邀请链接">邀请供应商</button>
-              <button class="button small" type="button" data-toast="权限边界已同步到 ERPNext 角色">同步权限</button>
+              <button class="button small" type="button" data-supplier-action="invite">邀请供应商</button>
+              <button class="button small" type="button" data-supplier-action="sync-permission">同步权限</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -2271,7 +2271,7 @@
             </div>
             <div class="toolbar-right">
               <button class="button" type="button" data-view-jump="supplierPortal"><i data-lucide="arrow-left" class="icon"></i>返回后台</button>
-              <button class="button" type="button" data-toast="已下载 PO-8891 S/N 上传模板"><i data-lucide="download" class="icon"></i>下载模板</button>
+              <button class="button" type="button" data-supplier-action="template" data-po="PO-8891"><i data-lucide="download" class="icon"></i>下载模板</button>
               <button class="button blue" type="button" data-open-import="供应商 S/N 激活"><i data-lucide="upload" class="icon"></i>上传 S/N</button>
             </div>
           </div>
@@ -2291,8 +2291,8 @@
               <div class="panel-subtitle">供应商只处理自己可见 PO 下的 S/N 激活，不参与排柜计划和海外仓出库扫码。</div>
             </div>
             <div class="toolbar-right">
-              <button class="button small" type="button" data-toast="已查看 PO-8891 号段范围">查看号段</button>
-              <button class="button small" type="button" data-toast="已复制供应商上传链接">复制上传链接</button>
+              <button class="button small" type="button" data-supplier-action="range" data-po="PO-8891">查看号段</button>
+              <button class="button small" type="button" data-supplier-action="copy-upload-link" data-po="PO-8891">复制上传链接</button>
             </div>
           </div>
           <div class="panel-body">
@@ -3033,6 +3033,21 @@
     </div>
   </section>
 
+  <section class="modal" id="actionModal" aria-label="操作详情">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="actionModalTitle">操作详情</div>
+        <div class="panel-subtitle" id="actionModalSubtitle">查看本次操作的模拟结果。</div>
+      </div>
+      <button class="icon-button" type="button" data-close-modal aria-label="关闭"><i data-lucide="x" class="icon"></i></button>
+    </div>
+    <div class="modal-body" id="actionModalBody"></div>
+    <div class="modal-footer">
+      <button class="button" type="button" data-close-modal>关闭</button>
+      <button class="button blue" type="button" id="actionModalPrimary">确认</button>
+    </div>
+  </section>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -3744,6 +3759,7 @@
     ];
     const supplierPreviewName = "Shenzhen PowerTech";
     let activeSnIssuePo = "PO-8891";
+    let activeActionPrimary = null;
     const salespersonDepartments = {
       Alina: "Amazon Team",
       Carlos: "Marketplace",
@@ -4918,8 +4934,8 @@
             <td>${chip(row.status)}</td>
             <td>${htmlText(row.lastUpload)}</td>
             <td>
-              <button class="button small" type="button" data-portal-toast="已打开 ${htmlAttr(row.po)} 号段明细">号段</button>
-              <button class="button small" type="button" data-portal-toast="已打开 ${htmlAttr(row.po)} 上传记录">记录</button>
+              <button class="button small" type="button" data-supplier-action="range" data-po="${htmlAttr(row.po)}">号段</button>
+              <button class="button small" type="button" data-supplier-action="record" data-po="${htmlAttr(row.po)}">记录</button>
             </td>
           </tr>
         `;
@@ -4970,10 +4986,6 @@
           <td>${chip(row[6])}</td>
         </tr>
       `).join("");
-
-      document.querySelectorAll("#supplierPortalView [data-portal-toast]").forEach((button) => {
-        button.addEventListener("click", () => showToast(button.dataset.portalToast));
-      });
     }
 
     function renderSupplierPortalPreview() {
@@ -5004,8 +5016,8 @@
             <td>${chip(row.status)}</td>
             <td>${htmlText(row.lastUpload)}</td>
             <td>
-              <button class="button small" type="button" data-portal-toast="已打开 ${htmlAttr(row.po)} 上传模板">模板</button>
-              <button class="button small" type="button" data-portal-toast="已打开 ${htmlAttr(row.po)} 上传记录">记录</button>
+              <button class="button small" type="button" data-supplier-action="template" data-po="${htmlAttr(row.po)}">模板</button>
+              <button class="button small" type="button" data-supplier-action="record" data-po="${htmlAttr(row.po)}">记录</button>
             </td>
           </tr>
         `;
@@ -5025,10 +5037,6 @@
           <td>${htmlText(row.reason)}</td>
         </tr>
       `).join("") : `<tr><td class="empty-row" colspan="10">当前筛选条件下没有上传结果。</td></tr>`;
-
-      document.querySelectorAll("#supplierPortalPreviewView [data-portal-toast]").forEach((button) => {
-        button.addEventListener("click", () => showToast(button.dataset.portalToast));
-      });
     }
 
     function renderSync() {
@@ -5333,12 +5341,299 @@
       showToast(`${row.po} 已发放 ${money(row.issuedSn)} 个 S/N，供应商门户可下载`);
     }
 
+    function renderActionTable(columns, rows, emptyText = "暂无数据") {
+      if (!rows.length) return `<div class="empty-state"><div><strong>${htmlText(emptyText)}</strong></div></div>`;
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>${columns.map((column) => `<th>${htmlText(column)}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${rows.map((row) => `
+                <tr>${columns.map((column) => `<td>${row[column] ?? ""}</td>`).join("")}</tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function openActionModal({ title, subtitle, body, primaryText = "", onPrimary = null }) {
+      document.getElementById("actionModalTitle").textContent = title;
+      document.getElementById("actionModalSubtitle").textContent = subtitle || "查看本次操作的模拟结果。";
+      document.getElementById("actionModalBody").innerHTML = body;
+      const primary = document.getElementById("actionModalPrimary");
+      primary.hidden = !primaryText;
+      primary.textContent = primaryText || "确认";
+      activeActionPrimary = onPrimary;
+      openModal("actionModal");
+    }
+
+    function supplierPoByNo(po) {
+      return supplierPurchaseOrders.find((row) => row.po === po) || supplierPurchaseOrders[0];
+    }
+
+    function supplierUploadRowsByPo(po) {
+      return snUploadPreview.filter((row) => row.po === po);
+    }
+
+    function supplierSnRowsByPo(po) {
+      return snRegistry.filter((row) => row.po === po);
+    }
+
+    function openSupplierRangeModal(po) {
+      const row = supplierPoByNo(po);
+      const prefix = snIssuePrefix(row);
+      const snRows = supplierSnRowsByPo(row.po);
+      const body = `
+        <div class="detail-grid">
+          ${detail("供应商", htmlText(row.supplier))}
+          ${detail("PO 日期", htmlText(row.poDate))}
+          ${detail("SKU", htmlText(row.sku))}
+          ${detail("采购数量", money(row.qty))}
+          ${detail("备品数量", money(row.spareQty))}
+          ${detail("已激活 S/N", money(row.activatedSn))}
+        </div>
+        <div class="notice info" style="margin-top:12px"><i data-lucide="info" class="icon"></i><span>号段只绑定 PO / SKU / 供应商，不绑定排柜计划；备品号启用前必须先作废一个原始号。</span></div>
+        <div style="margin-top:12px">
+          ${renderActionTable(["号段类型", "数量", "范围", "供应商可见", "规则"], [
+            { "号段类型": chip("原始号"), "数量": money(row.qty), "范围": htmlText(snIssueRange(prefix, row.qty)), "供应商可见": chip("确认后可见"), "规则": "用于产品铭牌 S/N" },
+            { "号段类型": chip("备品号"), "数量": money(row.spareQty), "范围": htmlText(snIssueRange(prefix, row.spareQty, true)), "供应商可见": chip("受控可见"), "规则": "备用替换，需内部审核" }
+          ])}
+        </div>
+        <div style="margin-top:12px">
+          ${renderActionTable(["S/N", "状态", "是否备品", "最近动作", "备注"], snRows.map((item) => ({
+            "S/N": htmlText(item.sn),
+            "状态": chip(item.status),
+            "是否备品": htmlText(item.spare),
+            "最近动作": htmlText(item.lastAction),
+            "备注": htmlText(item.remark)
+          })), "当前 PO 暂无主档样例")}
+        </div>
+      `;
+      openActionModal({
+        title: `${row.po} 号段明细`,
+        subtitle: "展示内部发放给供应商的原始号段、备品号段和当前生命周期。",
+        body
+      });
+    }
+
+    function openSupplierRecordModal(po) {
+      const row = supplierPoByNo(po);
+      const uploadRows = supplierUploadRowsByPo(row.po);
+      const body = `
+        <div class="detail-grid">
+          ${detail("供应商", htmlText(row.supplier))}
+          ${detail("最近上传", htmlText(row.lastUpload))}
+          ${detail("PO 状态", chip(row.status))}
+        </div>
+        <div style="margin-top:12px">
+          ${renderActionTable(["行号", "S/N", "类型", "工厂批次", "激活时间", "校验状态", "处理动作", "原因"], uploadRows.map((item) => ({
+            "行号": htmlText(item.rowNo),
+            "S/N": `<strong>${htmlText(item.sn)}</strong>`,
+            "类型": chip(item.type),
+            "工厂批次": htmlText(item.factoryBatch),
+            "激活时间": htmlText(item.activatedAt),
+            "校验状态": chip(item.status),
+            "处理动作": chip(item.action),
+            "原因": htmlText(item.reason)
+          })), "当前 PO 暂无上传记录")}
+        </div>
+      `;
+      openActionModal({
+        title: `${row.po} 上传记录`,
+        subtitle: "查看供应商已上传 Excel 的逐行校验结果。",
+        body
+      });
+    }
+
+    function openSupplierTemplateModal(po) {
+      const row = supplierPoByNo(po);
+      const body = `
+        <div class="detail-grid">
+          ${detail("模板名称", `${htmlText(row.po)}_SN_Activation_Template.xlsx`)}
+          ${detail("供应商", htmlText(row.supplier))}
+          ${detail("允许上传 PO", htmlText(row.po))}
+          ${detail("必填字段", "PO / SKU / S/N / 类型 / 工厂批次 / 激活时间")}
+          ${detail("校验规则", "PO 权限、SKU、号段、重复、备品前置")}
+          ${detail("写入策略", "校验通过写入主档，异常进入内部处理")}
+        </div>
+        <div class="notice info" style="margin-top:12px"><i data-lucide="download" class="icon"></i><span>原型中模拟下载模板；正式系统会按当前供应商和 PO 生成 Excel 模板。</span></div>
+      `;
+      openActionModal({
+        title: `${row.po} 上传模板`,
+        subtitle: "供应商只能下载自己可见 PO 的 S/N 激活模板。",
+        body,
+        primaryText: "模拟下载",
+        onPrimary: () => {
+          closeModals();
+          showToast(`${row.po} S/N 上传模板已生成`);
+        }
+      });
+    }
+
+    function copySupplierUploadLink(po) {
+      const row = supplierPoByNo(po);
+      const link = `https://portal.faray.example/supplier/sn-upload?po=${encodeURIComponent(row.po)}`;
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(link).catch(() => {});
+      }
+      openActionModal({
+        title: `${row.po} 上传链接`,
+        subtitle: "正式系统会生成带供应商权限边界的上传入口。",
+        body: `
+          <div class="detail-grid">
+            ${detail("供应商", htmlText(row.supplier))}
+            ${detail("可上传 PO", htmlText(row.po))}
+            ${detail("链接", htmlText(link))}
+          </div>
+          <div class="notice info" style="margin-top:12px"><i data-lucide="copy" class="icon"></i><span>已模拟复制链接；链接只允许当前供应商上传该 PO 的 S/N。</span></div>
+        `
+      });
+      showToast(`${row.po} 上传链接已复制`);
+    }
+
+    function openReminderModal() {
+      const pendingRows = supplierPurchaseOrders.filter((row) => row.status !== "已完成");
+      openActionModal({
+        title: "提醒上传",
+        subtitle: "仅提醒待上传或部分激活的供应商，不触达已完成 PO。",
+        body: renderActionTable(["供应商", "PO", "PO 日期", "状态", "待激活", "提醒方式"], pendingRows.map((row) => {
+          const pending = Math.max(row.qty - Math.min(row.qty, row.activatedSn), 0);
+          return {
+            "供应商": htmlText(row.supplier),
+            "PO": htmlText(row.po),
+            "PO 日期": htmlText(row.poDate),
+            "状态": chip(row.status),
+            "待激活": money(pending),
+            "提醒方式": "门户站内提醒 / 飞书通知"
+          };
+        })),
+        primaryText: "发送提醒",
+        onPrimary: () => {
+          addLog("供应商门户", "提醒上传", "-", `${pendingRows.length} 个 PO`);
+          closeModals();
+          showToast(`已向 ${pendingRows.length} 个待处理 PO 的供应商发送提醒`);
+        }
+      });
+    }
+
+    function openExceptionReviewModal() {
+      const exceptionRows = snUploadPreview.filter((row) => row.status !== "校验通过");
+      openActionModal({
+        title: "异常批量审核",
+        subtitle: "只处理校验失败和备品待审核行；校验通过行不进入审核。",
+        body: renderActionTable(["行号", "PO", "SKU", "S/N", "校验状态", "处理动作", "原因"], exceptionRows.map((row) => ({
+          "行号": htmlText(row.rowNo),
+          "PO": htmlText(row.po),
+          "SKU": htmlText(row.sku),
+          "S/N": `<strong>${htmlText(row.sn)}</strong>`,
+          "校验状态": chip(row.status),
+          "处理动作": chip(row.action),
+          "原因": htmlText(row.reason)
+        }))),
+        primaryText: "提交审核",
+        onPrimary: () => {
+          addLog("S/N 上传异常", "批量审核", "-", `${exceptionRows.length} 行进入处理`);
+          closeModals();
+          showToast(`已提交 ${exceptionRows.length} 行异常进入内部审核`);
+        }
+      });
+    }
+
+    function openAfterSalesModal() {
+      const rows = snRegistry.map((row) => ({
+        "S/N": `<strong>${htmlText(row.sn)}</strong>`,
+        "有效性": chip(row.status),
+        "SKU": htmlText(row.sku),
+        "PO": htmlText(row.po),
+        "供应商": htmlText(row.supplier),
+        "最近动作": htmlText(row.lastAction),
+        "售后判断": row.status === "已激活" ? chip("有效") : row.status === "已作废" ? chip("已作废") : chip("待审核")
+      }));
+      openActionModal({
+        title: "售后 S/N 查询",
+        subtitle: "客服输入 S/N 后判断是否真实生效、所属 SKU / PO / 工厂批次。",
+        body: `
+          <div class="detail-grid">
+            ${detail("查询字段", "S/N 精确匹配")}
+            ${detail("返回信息", "有效性 / SKU / PO / 供应商 / 最近动作")}
+            ${detail("仓库依赖", "不依赖海外仓或 FBA 出库扫码")}
+          </div>
+          <div style="margin-top:12px">${renderActionTable(["S/N", "有效性", "SKU", "PO", "供应商", "最近动作", "售后判断"], rows)}</div>
+        `
+      });
+    }
+
+    function openInviteModal() {
+      const rows = supplierAccounts.map((row) => ({
+        "供应商": htmlText(row[0]),
+        "账号": htmlText(row[1]),
+        "可见 PO": htmlText(row[2]),
+        "状态": chip(row[6]),
+        "邀请动作": row[6] === "邀请中" ? "重发邀请" : "复制登录入口"
+      }));
+      openActionModal({
+        title: "邀请供应商",
+        subtitle: "为供应商生成门户账号或重发登录邀请。",
+        body: renderActionTable(["供应商", "账号", "可见 PO", "状态", "邀请动作"], rows),
+        primaryText: "生成邀请",
+        onPrimary: () => {
+          addLog("供应商门户", "邀请供应商", "-", "邀请链接已生成");
+          closeModals();
+          showToast("供应商邀请链接已生成");
+        }
+      });
+    }
+
+    function openPermissionSyncModal() {
+      openActionModal({
+        title: "同步权限",
+        subtitle: "将供应商账号、可见 PO 和字段隐藏规则同步到 ERPNext 角色边界。",
+        body: renderActionTable(["供应商", "门户账号", "可见 PO", "可操作", "不可见字段", "状态"], supplierAccounts.map((row) => ({
+          "供应商": htmlText(row[0]),
+          "门户账号": htmlText(row[1]),
+          "可见 PO": htmlText(row[2]),
+          "可操作": htmlText(row[3]),
+          "不可见字段": htmlText(row[4]),
+          "状态": chip(row[6])
+        }))),
+        primaryText: "同步到 ERPNext",
+        onPrimary: () => {
+          addLog("供应商门户", "同步权限", "-", "ERPNext 角色边界已同步");
+          closeModals();
+          showToast("权限边界已同步到 ERPNext 角色");
+        }
+      });
+    }
+
+    function handleSupplierAction(button) {
+      const action = button.dataset.supplierAction;
+      const po = button.dataset.po || activeSnIssuePo;
+      if (action === "range") return openSupplierRangeModal(po);
+      if (action === "record") return openSupplierRecordModal(po);
+      if (action === "template") return openSupplierTemplateModal(po);
+      if (action === "copy-upload-link") return copySupplierUploadLink(po);
+      if (action === "remind") return openReminderModal();
+      if (action === "review-exceptions") return openExceptionReviewModal();
+      if (action === "after-sales") return openAfterSalesModal();
+      if (action === "invite") return openInviteModal();
+      if (action === "sync-permission") return openPermissionSyncModal();
+      showToast("该供应商门户动作尚未配置");
+    }
+
+    function handleDelegatedButtonClick(event) {
+      const button = event.target.closest("button");
+      if (!button || button.disabled) return;
+      if (button.dataset.supplierAction) return handleSupplierAction(button);
+      if (button.dataset.viewJump) return switchView(button.dataset.viewJump);
+      if (button.dataset.openImport) return openImport(button.dataset.openImport);
+      if (button.dataset.export) return exportDataset(button.dataset.export);
+      if (button.dataset.toast) return showToast(button.dataset.toast);
+    }
+
     function bindEvents() {
       document.querySelectorAll(".nav-item, .subnav-item").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.view)));
-      document.querySelectorAll("[data-view-jump]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.viewJump)));
-      document.querySelectorAll("[data-open-import]").forEach((button) => button.addEventListener("click", () => openImport(button.dataset.openImport)));
-      document.querySelectorAll("[data-toast]").forEach((button) => button.addEventListener("click", () => showToast(button.dataset.toast)));
-      document.querySelectorAll("[data-export]").forEach((button) => button.addEventListener("click", () => exportDataset(button.dataset.export)));
+      document.addEventListener("click", handleDelegatedButtonClick);
       document.querySelectorAll("[data-trend-mode]").forEach((button) => button.addEventListener("click", () => {
         activeTrendMode = button.dataset.trendMode;
         renderHistorySales();
@@ -5613,6 +5908,9 @@
 
       document.querySelectorAll("[data-close-modal]").forEach((button) => button.addEventListener("click", closeModals));
       document.getElementById("modalBackdrop").addEventListener("click", closeModals);
+      document.getElementById("actionModalPrimary").addEventListener("click", () => {
+        if (activeActionPrimary) activeActionPrimary();
+      });
       document.getElementById("prevImport").addEventListener("click", () => { importStep = Math.max(1, importStep - 1); renderImport(); });
       document.getElementById("nextImport").addEventListener("click", () => {
         if (importStep === 4) completeImport();
