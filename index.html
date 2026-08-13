@@ -4389,6 +4389,38 @@
         "操作人": row.operator,
         "备注": row.remark
       }));
+      const targetTemplateColumns = ["SKU", "平台 SKU", "国家", "平台", "部门", "销售员", "本月目标销量", "未来第1个月目标销量", "未来第2个月目标销量", "未来第3个月目标销量", "未来第4个月目标销量", "未来第5个月目标销量", "未来第6个月目标销量", "备注"];
+      const targetTemplateRows = targets.map((row) => ({
+        "SKU": row.sku,
+        "平台 SKU": row.platformSku,
+        "国家": row.country,
+        "平台": row.platform,
+        "部门": row.department,
+        "销售员": row.owner,
+        "本月目标销量": row.currentTargetQty,
+        "未来第1个月目标销量": row.futureTargetQty[0],
+        "未来第2个月目标销量": row.futureTargetQty[1],
+        "未来第3个月目标销量": row.futureTargetQty[2],
+        "未来第4个月目标销量": row.futureTargetQty[3],
+        "未来第5个月目标销量": row.futureTargetQty[4],
+        "未来第6个月目标销量": row.futureTargetQty[5],
+        "备注": row.remark
+      }));
+      const syncQueueColumns = ["同步批次号", "对象类型", "业务对象", "目标 DocType", "提交人", "提交时间", "操作摘要", "同步状态", "错误 / 重试"];
+      const syncQueueRows = filteredSyncQueue().map(({ row }) => {
+        const submit = splitSubmitMeta(row[4]);
+        return {
+          "同步批次号": row[0],
+          "对象类型": row[1],
+          "业务对象": row[2],
+          "目标 DocType": row[3],
+          "提交人": submit.person,
+          "提交时间": submit.time,
+          "操作摘要": row[5],
+          "同步状态": row[6],
+          "错误 / 重试": row[7]
+        };
+      });
       const datasets = {
         historySales: { name: "历史销量明细", columns: historySalesColumns, rows: historySales },
         firstAllocationSummary: { name: "一次分配汇总", columns: firstAllocationSummaryColumns, rows: firstAllocationSummary },
@@ -4401,7 +4433,9 @@
         snUploadPreview: { name: "SN上传校验预览", columns: snUploadColumns, rows: snUploadRows },
         snUploadExceptions: { name: "SN上传异常", columns: snUploadColumns, rows: snUploadExceptionRows },
         supplierPreviewUpload: { name: "供应商门户上传结果", columns: snUploadColumns, rows: supplierPreviewUploadRows },
-        snRegistry: { name: "SN主档生命周期", columns: snRegistryColumns, rows: snRegistryRows }
+        snRegistry: { name: "SN主档生命周期", columns: snRegistryColumns, rows: snRegistryRows },
+        targetTemplate: { name: "目标销量导入模板", columns: targetTemplateColumns, rows: targetTemplateRows },
+        syncQueue: { name: "ERPNext同步队列", columns: syncQueueColumns, rows: syncQueueRows }
       };
       if (key === "salesTrend") {
         return {
@@ -4849,8 +4883,8 @@
             <td>${mappingSelectInput(salesperson || "", index, "salesperson", salespersonOptions)}</td>
             <td data-mapping-department="${index}">${htmlText(linkedDepartment)}</td>
             <td>
-              <button class="button small" type="button" data-toast="已打开映射编辑抽屉">编辑</button>
-              <button class="button small" type="button" data-toast="已打开映射详情">查看</button>
+              <button class="button small" type="button" data-mapping-action="edit" data-index="${index}">编辑</button>
+              <button class="button small" type="button" data-mapping-action="view" data-index="${index}">查看</button>
             </td>
           </tr>
 	        `;
@@ -5606,6 +5640,120 @@
       });
     }
 
+    function splitMappingParts(row) {
+      const [platformSku = "", asin = ""] = String(row?.[1] ?? "").split(" / ").map((part) => part.trim());
+      const [platform = "", store = ""] = String(row?.[2] ?? "").split(" / ").map((part) => part.trim());
+      const [salesperson = "", department = ""] = String(row?.[8] ?? "").split(" / ").map((part) => part.trim());
+      return { platformSku, asin, platform, store, salesperson, department };
+    }
+
+    function openMappingModal(index, mode) {
+      const row = mappings[Number(index)];
+      if (!row) return showToast("找不到平台 SKU 映射记录");
+      const parts = splitMappingParts(row);
+      const resolvedDepartment = salespersonDepartments[parts.salesperson] || parts.department || "未配置";
+      const isEdit = mode === "edit";
+      const salespersonOptions = Object.keys(salespersonDepartments);
+      const body = isEdit ? `
+        <div class="detail-grid">
+          ${detail("库存 SKU", htmlText(row[0]))}
+          ${detail("平台 SKU", htmlText(parts.platformSku))}
+          ${detail("ASIN", htmlText(parts.asin))}
+          ${detail("平台 / 店铺", `${htmlText(parts.platform)} / ${htmlText(parts.store)}`)}
+          ${detail("国家", htmlText(row[3]))}
+          ${detail("当前状态", chip(row[9]))}
+        </div>
+        <div class="form-grid" style="margin-top:12px">
+          <label class="field">
+            <span>默认发货仓</span>
+            <input class="input" id="mappingModalWarehouse" value="${htmlAttr(row[4])}" />
+          </label>
+          <label class="field">
+            <span>销售员</span>
+            <select class="select" id="mappingModalSalesperson">
+              ${salespersonOptions.map((option) => `<option ${option === parts.salesperson ? "selected" : ""}>${htmlText(option)}</option>`).join("")}
+            </select>
+          </label>
+          <label class="field">
+            <span>是否清货</span>
+            <select class="select" id="mappingModalClearance">
+              ${["否", "是"].map((option) => `<option ${option === row[7] ? "selected" : ""}>${option}</option>`).join("")}
+            </select>
+          </label>
+        </div>
+        <div class="notice info" style="margin-top:12px"><i data-lucide="info" class="icon"></i><span>保存后进入草稿状态，需在列表勾选并提交生效后同步到 ERPNext。</span></div>
+      ` : `
+        <div class="detail-grid">
+          ${detail("库存 SKU", htmlText(row[0]))}
+          ${detail("平台 SKU", htmlText(parts.platformSku))}
+          ${detail("ASIN", htmlText(parts.asin))}
+          ${detail("平台 / 店铺", `${htmlText(parts.platform)} / ${htmlText(parts.store)}`)}
+          ${detail("国家", htmlText(row[3]))}
+          ${detail("默认发货仓", htmlText(row[4]))}
+          ${detail("ERPNext Warehouse", htmlText(row[5]))}
+          ${detail("产品等级", htmlText(row[6]))}
+          ${detail("是否清货", htmlText(row[7]))}
+          ${detail("销售员 / 部门", `${htmlText(parts.salesperson)} / ${htmlText(resolvedDepartment)}`)}
+          ${detail("状态", chip(row[9]))}
+        </div>
+      `;
+      openActionModal({
+        title: isEdit ? "编辑平台 SKU 映射" : "查看平台 SKU 映射",
+        subtitle: isEdit ? "维护默认发货仓、销售员和清货标记；生效动作仍在列表提交。" : "查看该库存 SKU 与平台 SKU、店铺、ERPNext Warehouse 的映射关系。",
+        body,
+        primaryText: isEdit ? "保存映射草稿" : "",
+        onPrimary: isEdit ? () => {
+          const warehouse = document.getElementById("mappingModalWarehouse").value.trim();
+          const salesperson = document.getElementById("mappingModalSalesperson").value;
+          const clearance = document.getElementById("mappingModalClearance").value;
+          if (!warehouse) return showToast("默认发货仓不能为空");
+          row[4] = warehouse;
+          row[7] = clearance;
+          row[8] = `${salesperson} / ${salespersonDepartments[salesperson] || resolvedDepartment}`;
+          row[9] = "草稿";
+          selectedMappings.add(Number(index));
+          addLog(row[0], "平台 SKU 映射", "列表值", "映射草稿已保存");
+          closeModals();
+          renderAll();
+          showToast(`${row[0]} 映射草稿已保存，待提交生效`);
+        } : null
+      });
+    }
+
+    function openQueueBulkSyncModal() {
+      const candidates = filteredSyncQueue().filter(({ row }) => row[6] === "待 ERPNext 同步");
+      openActionModal({
+        title: "批量标记已同步",
+        subtitle: candidates.length ? "只处理当前筛选范围内状态为待 ERPNext 同步的队列记录。" : "当前筛选范围内没有待 ERPNext 同步记录。",
+        body: renderActionTable(["同步批次号", "对象类型", "业务对象", "目标 DocType", "提交时间"], candidates.map(({ row }) => {
+          const submit = splitSubmitMeta(row[4]);
+          return {
+            "同步批次号": `<strong>${htmlText(row[0])}</strong>`,
+            "对象类型": chip(row[1]),
+            "业务对象": htmlText(row[2]),
+            "目标 DocType": htmlText(row[3]),
+            "提交时间": htmlText(submit.time)
+          };
+        }), "当前没有可标记的同步队列"),
+        primaryText: candidates.length ? "标记已同步" : "",
+        onPrimary: candidates.length ? () => {
+          candidates.forEach(({ row }) => {
+            const before = row[6];
+            row[6] = "ERPNext 已同步";
+            row[7] = "- / 0";
+            addLog(row[0], "同步状态", before, "ERPNext 已同步");
+          });
+          closeModals();
+          renderAll();
+          showToast(`已标记 ${candidates.length} 条队列为 ERPNext 已同步`);
+        } : null
+      });
+    }
+
+    function handleMappingAction(button) {
+      return openMappingModal(button.dataset.index, button.dataset.mappingAction);
+    }
+
     function handleSupplierAction(button) {
       const action = button.dataset.supplierAction;
       const po = button.dataset.po || activeSnIssuePo;
@@ -5625,6 +5773,7 @@
       const button = event.target.closest("button");
       if (!button || button.disabled) return;
       if (button.dataset.supplierAction) return handleSupplierAction(button);
+      if (button.dataset.mappingAction) return handleMappingAction(button);
       if (button.dataset.viewJump) return switchView(button.dataset.viewJump);
       if (button.dataset.openImport) return openImport(button.dataset.openImport);
       if (button.dataset.export) return exportDataset(button.dataset.export);
@@ -5846,7 +5995,7 @@
       document.getElementById("savePlanDraft").addEventListener("click", () => savePlan(false));
       document.getElementById("savePlanSubmit").addEventListener("click", () => savePlan(true));
 
-	      document.getElementById("exportTargetTemplate").addEventListener("click", () => showToast("已生成目标销量维护模板"));
+	      document.getElementById("exportTargetTemplate").addEventListener("click", () => exportDataset("targetTemplate"));
 	      document.getElementById("submitTargetVersions").addEventListener("click", () => {
 	        if (!selectedTargets.size) return showToast("请先勾选目标销量记录");
 	        const count = selectedTargets.size;
@@ -5890,8 +6039,8 @@
 	        renderAll();
 	        showToast(`已提交 ${count} 条平台 SKU 映射生效`);
 	      });
-      document.getElementById("exportQueue").addEventListener("click", () => showToast("已生成 ERPNext 待同步队列导出任务"));
-      document.getElementById("markQueueDone").addEventListener("click", () => showToast("请选择具体队列行标记同步状态"));
+      document.getElementById("exportQueue").addEventListener("click", () => exportDataset("syncQueue"));
+      document.getElementById("markQueueDone").addEventListener("click", openQueueBulkSyncModal);
 
       document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
       document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
