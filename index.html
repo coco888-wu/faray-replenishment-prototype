@@ -7785,6 +7785,27 @@
       return { view, label: pageMeta[view]?.[0] || "工作区", description: pageMeta[view]?.[1] || "", icon: "layout-dashboard", section: "工作区" };
     }
 
+    function viewMeta(view) {
+      if (view === "supplierPortal") {
+        if (activeSupplierPortalMenu === "S/N 主档" || activeSupplierPortalMenu === "扫码激活") {
+          return ["S/N 管理", "管理 S/N 生成、标签批次、扫码激活、异常、主档追溯和售后查询。"];
+        }
+        if (activeSupplierPortalMenu === "账号权限") {
+          return ["供应商门户账号权限", "管理供应商组织、成员邀请、PO 可见范围和字段隔离。"];
+        }
+        return ["供应商门户管理", "管理供应商可见 PO、标签包下载、门户预览和提醒扫码。"];
+      }
+      return pageMeta[view] || ["工作区", ""];
+    }
+
+    function updatePageHeading(view) {
+      const [titleText, subtitleText] = viewMeta(view);
+      document.getElementById("pageTitle").textContent = titleText;
+      document.getElementById("pageSubtitle").textContent = subtitleText;
+      document.getElementById("breadcrumbPage").textContent = titleText;
+      syncWorkspaceContext(view);
+    }
+
     function renderWorkspaceMenu() {
       const body = document.getElementById("workspaceMenuBody");
       if (!body) return;
@@ -7838,7 +7859,7 @@
       document.getElementById("openSyncTop").hidden = app === "erpnext";
       document.querySelectorAll("[data-app]").forEach((button) => button.classList.toggle("active", button.dataset.app === app));
       document.getElementById("appSwitcherCurrent").textContent = `当前：${app === "erpnext" ? "ERPNext" : "计划备货"}`;
-      document.getElementById("breadcrumbPage").textContent = pageMeta[view]?.[0] || (app === "erpnext" ? "Home" : "SKU 备货工作台");
+      document.getElementById("breadcrumbPage").textContent = viewMeta(view)[0] || (app === "erpnext" ? "Home" : "SKU 备货工作台");
       syncWorkspaceContext(view);
     }
 
@@ -7953,14 +7974,12 @@
       document.querySelectorAll(".view").forEach((section) => section.classList.remove("active"));
       document.getElementById(`${view}View`).classList.add("active");
       document.querySelectorAll(".nav-item").forEach((item) => {
-        item.classList.toggle("active", item.dataset.view === view || (item.dataset.view === "workbench" && workbenchChildViews.has(view)) || (item.dataset.view === "supplierPortal" && view === "supplierPortalPreview"));
+        const isPlanningSupplierItem = item.closest("#planningNav") && view === "supplierPortal" && item.dataset.supplierMenu;
+        item.classList.toggle("active", isPlanningSupplierItem ? item.dataset.supplierMenu === activeSupplierPortalMenu : item.dataset.view === view || (item.dataset.view === "workbench" && workbenchChildViews.has(view)) || (item.dataset.view === "supplierPortal" && view === "supplierPortalPreview"));
       });
       document.querySelectorAll(".subnav-item").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
       syncPrimaryNavigation(view);
-      document.getElementById("pageTitle").textContent = pageMeta[view][0];
-      document.getElementById("pageSubtitle").textContent = pageMeta[view][1];
-      document.getElementById("breadcrumbPage").textContent = pageMeta[view][0];
-      syncWorkspaceContext(view);
+      updatePageHeading(view);
       renderFilterMode(view);
       if (view === "sync") renderSync();
       else renderAll();
@@ -8923,6 +8942,7 @@
       document.querySelectorAll("[data-supplier-menu]").forEach((button) => button.addEventListener("click", () => {
         activeSupplierPortalMenu = button.dataset.supplierMenu;
         renderSupplierPortal();
+        updatePageHeading("supplierPortal");
         syncPrimaryNavigation("supplierPortal");
       }));
       document.getElementById("applyPlanSavedView").addEventListener("click", () => {
