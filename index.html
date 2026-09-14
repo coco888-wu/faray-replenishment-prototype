@@ -3695,13 +3695,13 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">S/N 发放与供应商执行</div>
-              <div class="panel-subtitle">按 PO 管理 S/N 生成、标签批次、扫码激活、备品启用和最近扫码。</div>
+              <div class="panel-subtitle">按 PO 管理 S/N 生成、铭牌/标签批次、扫码激活、备品启用和最近扫码。</div>
             </div>
             <div class="toolbar-right">
               <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户预览</button>
               <button class="button small" type="button" data-export="supplierPo">导出</button>
               <button class="button small" type="button" data-supplier-action="remind">提醒扫码</button>
-              <button class="button small blue" type="button" id="openSnIssueModal">生成 S/N / 标签</button>
+              <button class="button small blue" type="button" id="openSnIssueModal">生成 S/N / 铭牌</button>
             </div>
           </div>
           <div class="panel-body">
@@ -3723,8 +3723,8 @@
               </div>
               <div class="portal-step">
                 <span class="portal-step-number">2</span>
-                <strong>同步标签</strong>
-                <p>S/N 与产品铭牌 / FBA 标签批次一起生成</p>
+                <strong>生成铭牌/标签包</strong>
+                <p>S/N 写入产品铭牌 / FBA 标签，供应商下载打印</p>
               </div>
               <div class="portal-step">
                 <span class="portal-step-number">3</span>
@@ -3751,7 +3751,7 @@
                   <th>备品比例</th>
                   <th>备品数量</th>
                   <th>已发放 S/N</th>
-                  <th>标签批次</th>
+                  <th>铭牌/标签批次</th>
                   <th>已扫码 S/N</th>
                   <th>待扫码</th>
                   <th>备品已启用</th>
@@ -4282,9 +4282,9 @@
                 </tr>
                 <tr>
                   <td><strong>供应商门户管理</strong></td>
-                  <td>供应商组织、成员账号、已下采购单、S/N 号段、标签批次、扫码记录、备品替换、异常审核、S/N 主档</td>
-                  <td>ERPNext Supplier / Purchase Order + 计划系统 S/N 号段、标签批次和扫码事件</td>
-                  <td>S/N 按 PO 行生成并发放；系统同步生成标签包，供应商只能扫码自己可见 PO 的 S/N，不绑定排柜计划。</td>
+                  <td>供应商组织、成员账号、已下采购单、S/N 号段、铭牌/标签批次、扫码记录、备品替换、异常审核、S/N 主档</td>
+                  <td>ERPNext Supplier / Purchase Order + 计划系统 S/N 号段、铭牌/标签批次和扫码事件</td>
+                  <td>S/N 按 PO 行生成并发放；系统同步生成铭牌/标签包，供应商只能扫码自己可见 PO 的 S/N，不绑定排柜计划。</td>
                   <td>供应商扫码和查看本组织数据；内部维护号段、审核备品、作废异常号</td>
                   <td>写入 S/N Registry，提供售后有效性查询；异常进入内部审核，不影响海外仓 / FBA 按 UPC 出库。</td>
                 </tr>
@@ -4394,10 +4394,10 @@
                   <td>排柜计划维护 / 平台 SKU 映射管理 -> 操作与 ERP 同步队列</td>
                 </tr>
                 <tr>
-                  <td>PO 下达后生成 S/N / 标签</td>
-                  <td>按 PO 数量和备品比例生成原始号段与备品号段，同时输出可打印标签包。</td>
-                  <td>PO、SKU、供应商、原始 S/N、备品 S/N、UPC、标签批次</td>
-                  <td>备品比例按规则计算；号段生成后仅允许内部作废、补发或重打标签</td>
+                  <td>PO 下达后生成 S/N / 铭牌</td>
+                  <td>按 PO 数量和备品比例生成原始号段与备品号段，同时输出可打印铭牌/标签包。</td>
+                  <td>PO、SKU、供应商、原始 S/N、备品 S/N、UPC、铭牌/标签批次</td>
+                  <td>备品比例按规则计算；号段生成后仅允许内部作废、补发或重打铭牌</td>
                   <td>ERPNext PO -> 供应商门户管理 -> S/N 主档</td>
                 </tr>
                 <tr>
@@ -4482,7 +4482,7 @@
                 </tr>
                 <tr>
                   <td>S/N Registry</td>
-                  <td>保存 S/N 号段、标签批次、扫码激活、保修注册、作废、备品替换和售后查询状态。</td>
+                  <td>保存 S/N 号段、铭牌/标签批次、扫码激活、保修注册、作废、备品替换和售后查询状态。</td>
                   <td>S/N</td>
                   <td>系统生成 / 供应商扫码 / 内部审核</td>
                   <td>供应商门户 -> S/N 主档；必要字段可回写 ERPNext 自定义对象</td>
@@ -4582,11 +4582,11 @@
     </div>
   </section>
 
-  <section class="modal" id="snIssueModal" aria-label="发放 S/N">
+  <section class="modal" id="snIssueModal" aria-label="生成 S/N / 铭牌">
     <div class="modal-header">
       <div>
-        <div class="modal-title">生成 S/N / 标签</div>
-        <div class="panel-subtitle">按 PO 生成原始号段、备品号段和可打印标签包，供应商扫码后生效。</div>
+        <div class="modal-title">生成 S/N / 铭牌</div>
+        <div class="panel-subtitle">按 PO 生成原始号段、备品号段和可打印铭牌/标签包，供应商扫码后生效。</div>
       </div>
       <button class="icon-button" type="button" data-close-modal aria-label="关闭"><i data-lucide="x" class="icon"></i></button>
     </div>
@@ -4600,13 +4600,13 @@
           <label>发放方式</label>
           <select class="select" id="snIssueMode">
             <option>生成 S/N + 产品铭牌 / FBA 标签</option>
-            <option>补发缺失标签</option>
+            <option>补发 / 重打铭牌</option>
           </select>
         </div>
         <div class="field">
           <label>供应商可见</label>
           <select class="select" id="snIssueVisibility">
-            <option>确认后立即可下载标签包</option>
+            <option>确认后立即可下载铭牌/标签包</option>
             <option>仅生成草稿</option>
           </select>
         </div>
@@ -4616,11 +4616,11 @@
 
       <div class="notice warning" style="margin-top:12px">
         <i data-lucide="triangle-alert" class="icon"></i>
-        <span>S/N 按 PO 发放，不绑定排柜计划。标签尽量与现有产品铭牌 / FBA 标签一起生成，减少供应商额外贴标工作。</span>
+        <span>S/N 按 PO 发放，不绑定排柜计划。铭牌/标签包尽量与现有产品铭牌 / FBA 标签一起生成，减少供应商额外贴标工作。</span>
       </div>
 
       <div class="table-wrap" style="margin-top:12px">
-        <table aria-label="S/N 发放号段预览">
+        <table aria-label="S/N 与铭牌生成预览">
           <thead>
             <tr>
               <th>号段类型</th>
@@ -4637,7 +4637,7 @@
     <div class="modal-footer">
       <button class="button" type="button" data-close-modal>取消</button>
       <button class="button" type="button" id="previewSnIssue">刷新预览</button>
-      <button class="button blue" type="button" id="confirmSnIssue">确认发放</button>
+      <button class="button blue" type="button" id="confirmSnIssue">确认生成铭牌</button>
     </div>
   </section>
 
@@ -5765,7 +5765,7 @@
     function chip(value) {
       let cls = "";
       if (["已确认", "已提交", "启用", "已识别", "ERPNext 已同步", "无需动作", "已生效", "已发货", "已完成", "已激活", "扫码通过", "校验通过", "已到仓", "已映射", "有效", "正常", "已同步"].includes(value)) cls = "green";
-      if (["草稿", "待 ERPNext 同步", "建议发货", "待保存", "待发货", "待扫码", "邀请中", "写入主档", "确认后可见", "标签可打印", "待下单", "排柜中", "已订舱", "运输中", "首选", "待分配仓库", "待同步"].includes(value)) cls = "blue";
+      if (["草稿", "待 ERPNext 同步", "建议发货", "待保存", "待发货", "待扫码", "邀请中", "写入主档", "确认后可见", "标签可打印", "铭牌可打印", "待下单", "排柜中", "已订舱", "运输中", "首选", "待分配仓库", "待同步"].includes(value)) cls = "blue";
       if (["待确认", "待确认（运营）", "缺货说明待补", "建议下单", "待维护", "待维护发货仓", "部分激活", "待审核", "备品替换审核", "受控可见", "清货", "待复核", "备选", "退货"].includes(value)) cls = "amber";
       if (["缺货风险", "ERPNext 同步失败", "已撤回", "未映射", "失败", "扫码失败", "校验失败", "拒绝写入", "已作废", "异常", "取消"].includes(value)) cls = "red";
       if (["活动计划", "目标销量", "备货参数", "备品号", "原始号"].includes(value)) cls = "purple";
@@ -6226,7 +6226,7 @@
         return { name: "SKU备货工作台", columns, rows };
       }
 
-      const supplierPoColumns = ["供应商", "PO", "PO 日期", "SKU", "平台 SKU", "UPC", "采购数量", "备品比例", "备品数量", "已发放 S/N", "标签批次", "已扫码 S/N", "待扫码", "备品已启用", "状态", "最近扫码"];
+      const supplierPoColumns = ["供应商", "PO", "PO 日期", "SKU", "平台 SKU", "UPC", "采购数量", "备品比例", "备品数量", "已发放 S/N", "铭牌/标签批次", "已扫码 S/N", "待扫码", "备品已启用", "状态", "最近扫码"];
       const supplierPoRows = filteredSupplierPurchaseOrders().map((row) => ({
         "供应商": row.supplier,
         "PO": row.po,
@@ -6238,7 +6238,7 @@
         "备品比例": row.spareRate,
         "备品数量": row.spareQty,
         "已发放 S/N": row.issuedSn,
-        "标签批次": row.labelBatch,
+        "铭牌/标签批次": row.labelBatch,
         "已扫码 S/N": row.activatedSn,
         "待扫码": Math.max(row.qty - Math.min(row.qty, row.activatedSn), 0),
         "备品已启用": row.spareActivated,
@@ -6278,7 +6278,7 @@
           "处理动作": row.action,
           "原因": row.reason
         }));
-      const snRegistryColumns = ["S/N", "S/N 状态", "保修注册", "SKU", "平台 SKU / UPC", "PO", "供应商", "工厂批次", "产线 / 工位", "是否备品", "替换原 S/N", "扫码时间", "激活人员", "扫码方式", "标签批次", "最近动作", "备注"];
+      const snRegistryColumns = ["S/N", "S/N 状态", "保修注册", "SKU", "平台 SKU / UPC", "PO", "供应商", "工厂批次", "产线 / 工位", "是否备品", "替换原 S/N", "扫码时间", "激活人员", "扫码方式", "铭牌/标签批次", "最近动作", "备注"];
       const snRegistryRows = snRegistry.map((row) => ({
         "S/N": row.sn,
         "S/N 状态": row.status,
@@ -6294,7 +6294,7 @@
         "扫码时间": row.activatedAt,
         "激活人员": row.activationUser,
         "扫码方式": row.activationMethod,
-        "标签批次": row.labelBatch,
+        "铭牌/标签批次": row.labelBatch,
         "最近动作": row.lastAction,
         "备注": row.remark
       }));
@@ -7506,6 +7506,7 @@
             <td>${chip(row.status)}</td>
             <td>${htmlText(row.lastUpload)}</td>
             <td>
+              <button class="button small" type="button" data-supplier-action="issue-nameplate" data-po="${htmlAttr(row.po)}">生成铭牌</button>
               <button class="button small" type="button" data-supplier-action="range" data-po="${htmlAttr(row.po)}">号段</button>
               <button class="button small" type="button" data-supplier-action="record" data-po="${htmlAttr(row.po)}">记录</button>
             </td>
@@ -7810,12 +7811,12 @@
     function viewMeta(view) {
       if (view === "supplierPortal") {
         if (activeSupplierPortalMenu === "S/N 主档" || activeSupplierPortalMenu === "扫码激活") {
-          return ["S/N 管理", "管理 S/N 生成、标签批次、扫码激活、异常、主档追溯和售后查询。"];
+          return ["S/N 管理", "管理 S/N 生成、铭牌/标签批次、扫码激活、异常、主档追溯和售后查询。"];
         }
         if (activeSupplierPortalMenu === "账号权限") {
           return ["供应商门户账号权限", "管理供应商组织、成员邀请、PO 可见范围和字段隔离。"];
         }
-        return ["供应商门户管理", "管理供应商可见 PO、标签包下载、门户预览和提醒扫码。"];
+        return ["供应商门户管理", "管理供应商可见 PO、铭牌/标签包下载、门户预览和提醒扫码。"];
       }
       return pageMeta[view] || ["工作区", ""];
     }
@@ -8104,7 +8105,7 @@
         detail("PO 日期", htmlText(row.poDate)),
         detail("采购数量", money(row.qty)),
         detail("备品比例", htmlText(row.spareRate)),
-        detail("标签批次", htmlText(row.labelBatch)),
+        detail("铭牌/标签批次", htmlText(row.labelBatch)),
         detail("本次发放总数", money(issueQty))
       ].join("");
 
@@ -8114,7 +8115,7 @@
           <td>${money(row.qty)}</td>
           <td><div class="row-title">${htmlText(snIssueRange(prefix, row.qty))}</div></td>
           <td>写入产品铭牌 / FBA 标签，供应商打印后贴附</td>
-          <td>${chip("标签可打印")}</td>
+          <td>${chip("铭牌可打印")}</td>
         </tr>
         <tr>
           <td>${chip("备品号")}</td>
@@ -8127,9 +8128,10 @@
       refreshIcons();
     }
 
-    function openSnIssueModal() {
+    function openSnIssueModal(po = "") {
       const firstVisible = filteredSupplierPurchaseOrders()[0];
-      if (firstVisible) activeSnIssuePo = firstVisible.po;
+      if (po) activeSnIssuePo = po;
+      else if (firstVisible) activeSnIssuePo = firstVisible.po;
       renderSnIssueModal();
       openModal("snIssueModal");
     }
@@ -8139,10 +8141,10 @@
       if (!row) return showToast("请选择需要发放 S/N 的 PO");
       row.issuedSn = row.qty + row.spareQty;
       if (row.status === "待扫码") row.status = "待扫码";
-      addLog(row.po, "S/N / 标签生成", "-", `${row.issuedSn} 个 S/N 与标签包已生成`);
+      addLog(row.po, "S/N / 铭牌生成", "-", `${row.issuedSn} 个 S/N 与铭牌/标签包已生成`);
       closeModals();
       renderAll();
-      showToast(`${row.po} 已生成 ${money(row.issuedSn)} 个 S/N 与标签包，供应商可下载打印`);
+      showToast(`${row.po} 已生成 ${money(row.issuedSn)} 个 S/N 与铭牌/标签包，供应商可下载打印`);
     }
 
     function renderActionTable(columns, rows, emptyText = "暂无数据") {
@@ -8437,13 +8439,13 @@
           ${detail("SKU", htmlText(row.sku))}
           ${detail("采购数量", money(row.qty))}
           ${detail("备品数量", money(row.spareQty))}
-          ${detail("标签批次", htmlText(row.labelBatch))}
+          ${detail("铭牌/标签批次", htmlText(row.labelBatch))}
           ${detail("已扫码 S/N", money(row.activatedSn))}
         </div>
-        <div class="notice info" style="margin-top:12px"><i data-lucide="info" class="icon"></i><span>号段只绑定 PO / SKU / 供应商，不绑定排柜计划；标签包随 S/N 生成，供应商打印贴附后逐台扫码激活。</span></div>
+        <div class="notice info" style="margin-top:12px"><i data-lucide="info" class="icon"></i><span>号段只绑定 PO / SKU / 供应商，不绑定排柜计划；铭牌/标签包随 S/N 生成，供应商打印贴附后逐台扫码激活。</span></div>
         <div style="margin-top:12px">
           ${renderActionTable(["号段类型", "数量", "范围", "供应商可见", "规则"], [
-            { "号段类型": chip("原始号"), "数量": money(row.qty), "范围": htmlText(snIssueRange(prefix, row.qty)), "供应商可见": chip("标签可打印"), "规则": "写入铭牌 / FBA 标签并扫码激活" },
+            { "号段类型": chip("原始号"), "数量": money(row.qty), "范围": htmlText(snIssueRange(prefix, row.qty)), "供应商可见": chip("铭牌可打印"), "规则": "写入铭牌 / FBA 标签并扫码激活" },
             { "号段类型": chip("备品号"), "数量": money(row.spareQty), "范围": htmlText(snIssueRange(prefix, row.spareQty, true)), "供应商可见": chip("受控可见"), "规则": "备用替换，需内部审核" }
           ])}
         </div>
@@ -8462,7 +8464,7 @@
       `;
       openActionModal({
         title: `${row.po} 号段明细`,
-        subtitle: "展示内部发放给供应商的原始号段、备品号段、标签批次和当前生命周期。",
+        subtitle: "展示内部发放给供应商的原始号段、备品号段、铭牌/标签批次和当前生命周期。",
         body
       });
     }
@@ -8475,7 +8477,7 @@
           ${detail("供应商", htmlText(row.supplier))}
           ${detail("最近扫码", htmlText(row.lastUpload))}
           ${detail("PO 状态", chip(row.status))}
-          ${detail("标签批次", htmlText(row.labelBatch))}
+          ${detail("铭牌/标签批次", htmlText(row.labelBatch))}
         </div>
         <div style="margin-top:12px">
           ${renderActionTable(["序号", "S/N", "类型", "工厂批次", "产线 / 工位", "扫码人员", "扫码时间", "扫码状态", "处理动作", "原因"], uploadRows.map((item) => ({
@@ -8538,7 +8540,7 @@
           <div class="detail-grid">
             ${detail("供应商", htmlText(row.supplier))}
             ${detail("可扫码 PO", htmlText(row.po))}
-            ${detail("标签批次", htmlText(row.labelBatch))}
+            ${detail("铭牌/标签批次", htmlText(row.labelBatch))}
             ${detail("链接", htmlText(link))}
           </div>
           <div class="notice info" style="margin-top:12px"><i data-lucide="copy" class="icon"></i><span>已模拟复制链接；链接只允许当前供应商组织成员扫码该 PO 的 S/N。</span></div>
@@ -8555,7 +8557,7 @@
           ${detail("供应商组织", htmlText(row.supplier))}
           ${detail("PO", htmlText(row.po))}
           ${detail("SKU", htmlText(row.sku))}
-          ${detail("标签批次", htmlText(row.labelBatch))}
+          ${detail("铭牌/标签批次", htmlText(row.labelBatch))}
           ${detail("当前人员", "Amy Chen / Line-A")}
           ${detail("扫码结果", `${money(row.activatedSn)} / ${money(row.qty)} 已扫码`)}
         </div>
@@ -8831,6 +8833,7 @@
       if (action === "range") return openSupplierRangeModal(po);
       if (action === "record") return openSupplierRecordModal(po);
       if (action === "template") return openSupplierTemplateModal(po);
+      if (action === "issue-nameplate") return openSnIssueModal(po);
       if (action === "scan") return openSupplierScanModal(po);
       if (action === "copy-upload-link") return copySupplierUploadLink(po);
       if (action === "remind") return openReminderModal();
