@@ -3742,6 +3742,7 @@
             <table class="supplier-upload-grid" aria-label="S/N 扫码校验预览">
               <thead>
                 <tr>
+                  <th class="sticky-col"><input type="checkbox" id="selectAllSnUploadRows" aria-label="全选扫码异常记录" /></th>
                   <th>序号</th>
                   <th>PO</th>
                   <th>SKU</th>
@@ -5659,6 +5660,7 @@
 	    const selectedTargets = new Set();
 	    const selectedParameters = new Set();
 	    const selectedMappings = new Set();
+	    const selectedSnUploadRows = new Set();
     let activePlanStatus = "待确认（运营）";
     let activePurchaseStatus = "待跟单";
     let activePurchaseModule = "采购计划";
@@ -7479,9 +7481,12 @@
         `;
       }).join("") : `<tr><td class="empty-row" colspan="16">没有匹配的供应商采购单。</td></tr>`;
 
-      const exceptionRows = snUploadPreview.filter((row) => row.status !== "扫码通过");
-      document.getElementById("snUploadRows").innerHTML = exceptionRows.length ? exceptionRows.map((row) => `
+      const exceptionRows = snUploadPreview
+        .map((row, index) => ({ row, index }))
+        .filter(({ row }) => row.status !== "扫码通过");
+      document.getElementById("snUploadRows").innerHTML = exceptionRows.length ? exceptionRows.map(({ row, index }) => `
         <tr>
+          <td class="sticky-col"><input type="checkbox" class="sn-upload-check" data-index="${index}" aria-label="选择 ${htmlAttr(row.sn)}" ${selectedSnUploadRows.has(index) ? "checked" : ""} /></td>
           <td>${row.rowNo}</td>
           <td>${htmlText(row.po)}</td>
           <td>${htmlText(row.sku)}</td>
@@ -7495,7 +7500,8 @@
           <td>${chip(row.action)}</td>
           <td>${htmlText(row.reason)}</td>
         </tr>
-      `).join("") : `<tr><td class="empty-row" colspan="12">当前没有待处理异常。</td></tr>`;
+      `).join("") : `<tr><td class="empty-row" colspan="13">当前没有待处理异常。</td></tr>`;
+      bindTableRowSelection(".sn-upload-check", "selectAllSnUploadRows", exceptionRows.map(({ index }) => index), selectedSnUploadRows);
 
       const registryRows = filteredSnRegistry();
       document.getElementById("snRegistryRows").innerHTML = registryRows.length ? registryRows.map((row) => `
@@ -8582,11 +8588,15 @@
     }
 
     function openExceptionReviewModal() {
-      const exceptionRows = snUploadPreview.filter((row) => row.status !== "扫码通过");
+      const exceptionRows = snUploadPreview
+        .map((row, index) => ({ row, index }))
+        .filter(({ row }) => row.status !== "扫码通过");
+      const selectedRows = exceptionRows.filter(({ index }) => selectedSnUploadRows.has(index));
+      if (!selectedRows.length) return showToast("请先勾选需要审核的异常记录");
       openActionModal({
         title: "异常批量审核",
-        subtitle: "只处理扫码失败和备品待审核记录；扫码通过记录不进入审核。",
-        body: renderActionTable(["序号", "PO", "SKU", "S/N", "扫码人员", "产线 / 工位", "扫码状态", "处理动作", "原因"], exceptionRows.map((row) => ({
+        subtitle: `已选择 ${selectedRows.length} 条异常记录；扫码通过记录不进入审核。`,
+        body: renderActionTable(["序号", "PO", "SKU", "S/N", "扫码人员", "产线 / 工位", "扫码状态", "处理动作", "原因"], selectedRows.map(({ row }) => ({
           "序号": htmlText(row.rowNo),
           "PO": htmlText(row.po),
           "SKU": htmlText(row.sku),
@@ -8599,9 +8609,11 @@
         }))),
         primaryText: "提交审核",
         onPrimary: () => {
-          addLog("S/N 扫码异常", "批量审核", "-", `${exceptionRows.length} 条进入处理`);
+          selectedRows.forEach(({ index }) => selectedSnUploadRows.delete(index));
+          addLog("S/N 扫码异常", "批量审核", "-", `${selectedRows.length} 条进入处理`);
           closeModals();
-          showToast(`已提交 ${exceptionRows.length} 条异常进入内部审核`);
+          renderSupplierPortal();
+          showToast(`已提交 ${selectedRows.length} 条异常进入内部审核`);
         }
       });
     }
@@ -9101,6 +9113,14 @@
 	      document.getElementById("selectAllMappings").addEventListener("change", (event) => {
 	        const visibleIndexes = mappings.map((_, index) => index);
 	        setVisibleTableSelection(".mapping-check", "selectAllMappings", visibleIndexes, selectedMappings, event.target.checked);
+	      });
+
+	      document.getElementById("selectAllSnUploadRows").addEventListener("change", (event) => {
+	        const visibleIndexes = snUploadPreview
+	          .map((row, index) => ({ row, index }))
+	          .filter(({ row }) => row.status !== "扫码通过")
+	          .map(({ index }) => index);
+	        setVisibleTableSelection(".sn-upload-check", "selectAllSnUploadRows", visibleIndexes, selectedSnUploadRows, event.target.checked);
 	      });
 
       document.getElementById("openImportTop").addEventListener("click", () => openImport("运营数据"));
