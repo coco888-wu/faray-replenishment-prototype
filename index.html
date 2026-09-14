@@ -3639,14 +3639,59 @@
 
       <section class="view" id="supplierPortalView">
         <div class="metric-grid" id="supplierPortalMetrics"></div>
-        <div class="module-tabs" aria-label="供应商门户分类">
+        <div class="module-tabs" aria-label="供应商门户分类" hidden>
           <button class="module-tab active" type="button" data-supplier-menu="PO 管理">供应商 PO</button>
           <button class="module-tab" type="button" data-supplier-menu="扫码激活">扫码激活</button>
           <button class="module-tab" type="button" data-supplier-menu="S/N 主档">S/N 主档</button>
           <button class="module-tab" type="button" data-supplier-menu="账号权限">账号权限</button>
         </div>
 
-        <section class="panel">
+        <section class="panel" data-supplier-section="portal">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">供应商门户与 PO 可见范围</div>
+              <div class="panel-subtitle">只管理供应商组织、可见采购单、前台预览和协同权限，不处理 S/N 生命周期。</div>
+            </div>
+            <div class="toolbar-right">
+              <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户预览</button>
+              <button class="button small" type="button" data-export="supplierPo">导出 PO</button>
+              <button class="button small" type="button" data-supplier-action="invite">邀请成员</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="filters supplier-po-filter-mode" aria-label="供应商采购单筛选">
+              <div class="field">
+                <label for="supplierPortalPoFilter">PO</label>
+                <input class="input js-supplier-po-filter" id="supplierPortalPoFilter" placeholder="PO-8891" />
+              </div>
+              <div class="field">
+                <label for="supplierPortalPoDateFilter">PO 日期</label>
+                <input class="input js-supplier-po-filter" id="supplierPortalPoDateFilter" type="date" />
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="supplier-po-grid" aria-label="供应商门户可见采购单">
+              <thead>
+                <tr>
+                  <th>供应商组织</th>
+                  <th>PO</th>
+                  <th>PO 日期</th>
+                  <th>SKU</th>
+                  <th>平台 SKU / UPC</th>
+                  <th>采购数量</th>
+                  <th>标签批次</th>
+                  <th>门户状态</th>
+                  <th>最近活动</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="supplierPortalPoRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" data-supplier-section="sn">
           <div class="panel-header">
             <div>
               <div class="panel-title">S/N 发放与供应商执行</div>
@@ -3720,7 +3765,7 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel" data-supplier-section="sn">
           <div class="panel-header">
             <div>
               <div class="panel-title">扫码异常待处理</div>
@@ -3754,7 +3799,7 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel" data-supplier-section="sn">
           <div class="panel-header">
             <div>
               <div class="panel-title">S/N 主档查询</div>
@@ -3809,7 +3854,7 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel" data-supplier-section="portal">
           <div class="panel-header">
             <div>
               <div class="panel-title">供应商组织与账号权限</div>
@@ -7419,6 +7464,10 @@
       return supplierPurchaseOrders.filter((row) => matchesSupplierPoFilters(row, "supplierPoFilter", "supplierPoDateFilter"));
     }
 
+    function filteredSupplierPortalPurchaseOrders() {
+      return supplierPurchaseOrders.filter((row) => matchesSupplierPoFilters(row, "supplierPortalPoFilter", "supplierPortalPoDateFilter"));
+    }
+
     function filteredSupplierPreviewPurchaseOrders() {
       return supplierPurchaseOrders
         .filter((row) => row.supplier === supplierPreviewName)
@@ -7435,26 +7484,67 @@
       });
     }
 
+    function isSupplierSnModule() {
+      return activeSupplierPortalMenu === "扫码激活" || activeSupplierPortalMenu === "S/N 主档";
+    }
+
     function renderSupplierPortal() {
       document.querySelectorAll("[data-supplier-menu]").forEach((button) => button.classList.toggle("active", button.dataset.supplierMenu === activeSupplierPortalMenu));
+      const snModule = isSupplierSnModule();
+      document.querySelectorAll("[data-supplier-section]").forEach((section) => {
+        section.hidden = section.dataset.supplierSection !== (snModule ? "sn" : "portal");
+      });
       const uniqueSuppliers = new Set(supplierPurchaseOrders.map((row) => row.supplier)).size;
       const pendingPo = supplierPurchaseOrders.filter((row) => row.status !== "已完成").length;
+      const issuedTotal = supplierPurchaseOrders.reduce((sum, row) => sum + row.issuedSn, 0);
       const activatedTotal = supplierPurchaseOrders.reduce((sum, row) => sum + row.activatedSn, 0);
+      const pendingScanTotal = supplierPurchaseOrders.reduce((sum, row) => {
+        const activatedNormal = Math.min(row.qty, row.activatedSn);
+        return sum + Math.max(row.qty - activatedNormal, 0);
+      }, 0);
       const uploadErrors = snUploadPreview.filter((row) => row.status === "扫码失败").length;
       const sparePending = snRegistry.filter((row) => row.spare === "是" && row.status === "待审核").length;
-      document.getElementById("supplierPortalMetrics").innerHTML = [
+      const supplierMemberTotal = supplierAccounts.reduce((sum, row) => sum + Number(row[2] || 0), 0);
+      const supplierPortalMetrics = [
         ["供应商组织", uniqueSuppliers, "组织 + 成员账号隔离", ""],
+        ["门户可见 PO", supplierPurchaseOrders.length, "按供应商隔离", "good"],
+        ["供应商成员", supplierMemberTotal, "组织下成员账号", ""],
         ["待处理 PO", pendingPo, "待扫码或部分扫码", pendingPo ? "warning" : "good"],
+        ["权限异常", 0, "当前无越权访问", "good"]
+      ];
+      const snMetrics = [
+        ["已发放 S/N", money(issuedTotal), "按 PO 生成号段", ""],
         ["已扫码 S/N", money(activatedTotal), "工厂扫码后生效", "good"],
+        ["待扫码 S/N", money(pendingScanTotal), "供应商继续扫码", pendingScanTotal ? "warning" : "good"],
         ["扫码异常", uploadErrors, "重复、越权、号段问题", uploadErrors ? "danger" : "good"],
         ["备品待审核", sparePending, "需先作废原始号", sparePending ? "warning" : "good"]
-      ].map(([label, value, foot, state]) => `
+      ];
+      document.getElementById("supplierPortalMetrics").innerHTML = (snModule ? snMetrics : supplierPortalMetrics).map(([label, value, foot, state]) => `
         <div class="metric ${state}">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
           <div class="foot">${foot}</div>
         </div>
       `).join("");
+
+      const visiblePortalRows = filteredSupplierPortalPurchaseOrders();
+      document.getElementById("supplierPortalPoRows").innerHTML = visiblePortalRows.length ? visiblePortalRows.map((row) => `
+        <tr>
+          <td><div class="row-title">${htmlText(row.supplier)}</div><div class="row-subtitle">组织级数据隔离</div></td>
+          <td><div class="row-title">${htmlText(row.po)}</div><div class="row-subtitle">门户可见</div></td>
+          <td>${htmlText(row.poDate)}</td>
+          <td>${htmlText(row.sku)}</td>
+          <td>${htmlText(row.platformSku)}<div class="row-subtitle">UPC ${htmlText(row.upc)}</div></td>
+          <td>${money(row.qty)}</td>
+          <td>${htmlText(row.labelBatch)}</td>
+          <td>${chip(row.status)}</td>
+          <td>${htmlText(row.lastUpload)}</td>
+          <td>
+            <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户</button>
+            <button class="button small" type="button" data-supplier-action="sync-permission">权限</button>
+          </td>
+        </tr>
+      `).join("") : `<tr><td class="empty-row" colspan="10">没有匹配的供应商门户采购单。</td></tr>`;
 
       const visibleSupplierRows = filteredSupplierPurchaseOrders();
       document.getElementById("supplierPoRows").innerHTML = visibleSupplierRows.length ? visibleSupplierRows.map((row) => {
