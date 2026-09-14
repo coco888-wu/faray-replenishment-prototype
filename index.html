@@ -7432,8 +7432,6 @@
       document.querySelectorAll("[data-supplier-section]").forEach((section) => {
         section.hidden = section.dataset.supplierSection !== (snModule ? "sn" : "portal");
       });
-      const uniqueSuppliers = new Set(supplierPurchaseOrders.map((row) => row.supplier)).size;
-      const pendingPo = supplierPurchaseOrders.filter((row) => row.status !== "已完成").length;
       const issuedTotal = supplierPurchaseOrders.reduce((sum, row) => sum + row.issuedSn, 0);
       const activatedTotal = supplierPurchaseOrders.reduce((sum, row) => sum + row.activatedSn, 0);
       const pendingScanTotal = supplierPurchaseOrders.reduce((sum, row) => {
@@ -7442,18 +7440,6 @@
       }, 0);
       const uploadErrors = snUploadPreview.filter((row) => row.status === "扫码失败").length;
       const sparePending = snRegistry.filter((row) => row.spare === "是" && row.status === "待审核").length;
-      const supplierMemberTotal = supplierMemberAccounts.length;
-      const activeSuppliers = supplierAccounts.filter((row) => row[7] === "启用").length;
-      const activeSupplierMembers = supplierMemberAccounts.filter((row) => row[4] === "启用").length;
-      const pendingSupplierInvites = supplierMemberAccounts.filter((row) => row[4] === "邀请中").length;
-      const disabledSupplierMembers = supplierMemberAccounts.filter((row) => row[4] === "停用").length;
-      const supplierPortalMetrics = [
-        ["供应商组织", supplierAccounts.length || uniqueSuppliers, "组织主数据", ""],
-        ["启用组织", activeSuppliers, "可登录门户", "good"],
-        ["组织账号", supplierMemberTotal, "组织下成员账号", ""],
-        ["待邀请账号", pendingSupplierInvites, "等待激活", pendingSupplierInvites ? "warning" : "good"],
-        ["停用账号", disabledSupplierMembers, "不可登录", disabledSupplierMembers ? "warning" : "good"]
-      ];
       const snMetrics = [
         ["已发放 S/N", money(issuedTotal), "按 PO 生成号段", ""],
         ["已扫码 S/N", money(activatedTotal), "工厂扫码后生效", "good"],
@@ -7461,13 +7447,15 @@
         ["扫码异常", uploadErrors, "重复、越权、号段问题", uploadErrors ? "danger" : "good"],
         ["备品待审核", sparePending, "需先作废原始号", sparePending ? "warning" : "good"]
       ];
-      document.getElementById("supplierPortalMetrics").innerHTML = (snModule ? snMetrics : supplierPortalMetrics).map(([label, value, foot, state]) => `
+      const supplierMetrics = document.getElementById("supplierPortalMetrics");
+      supplierMetrics.hidden = !snModule;
+      supplierMetrics.innerHTML = snModule ? snMetrics.map(([label, value, foot, state]) => `
         <div class="metric ${state}">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
           <div class="foot">${foot}</div>
         </div>
-      `).join("");
+      `).join("") : "";
 
       document.getElementById("supplierOrgRows").innerHTML = supplierAccounts.map((row) => `
         <tr>
