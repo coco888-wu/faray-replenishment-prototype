@@ -2477,7 +2477,7 @@
             <i data-lucide="users-round" class="icon"></i><span>供应商门户</span><span class="badge">3</span><i data-lucide="chevron-down" class="nav-chevron"></i>
           </button>
           <div class="nav-children" data-nav-children-for="supplierPortal" hidden aria-label="供应商门户菜单">
-            <button class="subnav-item" type="button" data-view="supplierPortal" data-nav-parent="supplierPortal" data-nav-key="supplierPortal:PO 管理" data-supplier-menu="PO 管理"><span class="subnav-dot"></span><span>供应商 PO</span></button>
+            <button class="subnav-item" type="button" data-view="supplierPortal" data-nav-parent="supplierPortal" data-nav-key="supplierPortal:组织管理" data-supplier-menu="组织管理"><span class="subnav-dot"></span><span>组织管理</span></button>
             <button class="subnav-item" type="button" data-view="supplierPortal" data-nav-parent="supplierPortal" data-nav-key="supplierPortal:扫码激活" data-supplier-menu="扫码激活"><span class="subnav-dot"></span><span>扫码激活</span></button>
             <button class="subnav-item" type="button" data-view="supplierPortal" data-nav-parent="supplierPortal" data-nav-key="supplierPortal:S/N 主档" data-supplier-menu="S/N 主档"><span class="subnav-dot"></span><span>S/N 主档</span></button>
             <button class="subnav-item" type="button" data-view="supplierPortal" data-nav-parent="supplierPortal" data-nav-key="supplierPortal:账号权限" data-supplier-menu="账号权限"><span class="subnav-dot"></span><span>账号权限</span></button>
@@ -2530,8 +2530,8 @@
         <div class="nav-section">
           <div class="nav-title">供应商协同</div>
           <div class="nav-list">
-            <button class="nav-item" type="button" data-view="supplierPortal" data-supplier-menu="PO 管理" title="供应商门户管理">
-              <i data-lucide="users-round" class="icon"></i><span>供应商门户管理</span><span class="badge">3</span>
+            <button class="nav-item" type="button" data-view="supplierPortal" data-supplier-menu="组织管理" title="供应商管理">
+              <i data-lucide="users-round" class="icon"></i><span>供应商管理</span><span class="badge">3</span>
             </button>
             <button class="nav-item" type="button" data-view="supplierPortal" data-supplier-menu="S/N 主档" title="S/N 管理">
               <i data-lucide="scan-barcode" class="icon"></i><span>S/N 管理</span>
@@ -3640,7 +3640,7 @@
       <section class="view" id="supplierPortalView">
         <div class="metric-grid" id="supplierPortalMetrics"></div>
         <div class="module-tabs" aria-label="供应商门户分类" hidden>
-          <button class="module-tab active" type="button" data-supplier-menu="PO 管理">供应商 PO</button>
+          <button class="module-tab active" type="button" data-supplier-menu="组织管理">组织管理</button>
           <button class="module-tab" type="button" data-supplier-menu="扫码激活">扫码激活</button>
           <button class="module-tab" type="button" data-supplier-menu="S/N 主档">S/N 主档</button>
           <button class="module-tab" type="button" data-supplier-menu="账号权限">账号权限</button>
@@ -3649,44 +3649,28 @@
         <section class="panel" data-supplier-section="portal">
           <div class="panel-header">
             <div>
-              <div class="panel-title">供应商门户与 PO 可见范围</div>
-              <div class="panel-subtitle">只管理供应商组织、可见采购单、前台预览和协同权限，不处理 S/N 生命周期。</div>
+              <div class="panel-title">供应商组织管理</div>
+              <div class="panel-subtitle">只维护供应商组织、组织管理员和组织状态。</div>
             </div>
             <div class="toolbar-right">
-              <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户预览</button>
-              <button class="button small" type="button" data-export="supplierPo">导出 PO</button>
-              <button class="button small" type="button" data-supplier-action="invite">邀请成员</button>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="filters supplier-po-filter-mode" aria-label="供应商采购单筛选">
-              <div class="field">
-                <label for="supplierPortalPoFilter">PO</label>
-                <input class="input js-supplier-po-filter" id="supplierPortalPoFilter" placeholder="PO-8891" />
-              </div>
-              <div class="field">
-                <label for="supplierPortalPoDateFilter">PO 日期</label>
-                <input class="input js-supplier-po-filter" id="supplierPortalPoDateFilter" type="date" />
-              </div>
+              <button class="button small" type="button" data-supplier-action="create-org">新增供应商组织</button>
+              <button class="button small" type="button" data-supplier-action="invite">邀请账号</button>
+              <button class="button small" type="button" data-supplier-action="sync-permission">同步账号</button>
             </div>
           </div>
           <div class="table-wrap">
-            <table class="supplier-po-grid" aria-label="供应商门户可见采购单">
+            <table class="supplier-account-grid" aria-label="供应商组织管理">
               <thead>
                 <tr>
                   <th>供应商组织</th>
-                  <th>PO</th>
-                  <th>PO 日期</th>
-                  <th>SKU</th>
-                  <th>平台 SKU / UPC</th>
-                  <th>采购数量</th>
-                  <th>标签批次</th>
-                  <th>门户状态</th>
+                  <th>组织管理员</th>
+                  <th>账号数</th>
+                  <th>组织状态</th>
                   <th>最近活动</th>
                   <th>操作</th>
                 </tr>
               </thead>
-              <tbody id="supplierPortalPoRows"></tbody>
+              <tbody id="supplierOrgRows"></tbody>
             </table>
           </div>
         </section>
@@ -3857,29 +3841,27 @@
         <section class="panel" data-supplier-section="portal">
           <div class="panel-header">
             <div>
-              <div class="panel-title">供应商组织与账号权限</div>
-              <div class="panel-subtitle">供应商是组织，组织下可邀请多个人员账号；每次扫码记录到人和产线。</div>
+              <div class="panel-title">组织下账号管理</div>
+              <div class="panel-subtitle">维护供应商组织下的管理员、产线扫码员和查看账号；每次扫码记录到具体账号。</div>
             </div>
             <div class="toolbar-right">
-              <button class="button small" type="button" data-supplier-action="invite">邀请供应商</button>
-              <button class="button small" type="button" data-supplier-action="sync-permission">同步权限</button>
+              <button class="button small" type="button" data-supplier-action="invite">邀请账号</button>
             </div>
           </div>
           <div class="table-wrap">
-            <table class="supplier-account-grid" aria-label="供应商组织与账号权限">
+            <table class="supplier-account-grid" aria-label="组织下账号管理">
               <thead>
                 <tr>
                   <th>供应商组织</th>
-                  <th>组织管理员</th>
-                  <th>成员数</th>
-                  <th>可见 PO</th>
-                  <th>可操作</th>
-                  <th>不可见字段</th>
-                  <th>最近操作</th>
+                  <th>账号</th>
+                  <th>姓名</th>
+                  <th>账号角色</th>
                   <th>状态</th>
+                  <th>最近操作</th>
+                  <th>操作</th>
                 </tr>
               </thead>
-              <tbody id="supplierAccountRows"></tbody>
+              <tbody id="supplierMemberRows"></tbody>
             </table>
           </div>
         </section>
@@ -4281,12 +4263,12 @@
                   <td>运营确认和部门主管确认均完成后进入待发货；提交生效后进入 ERP 同步队列。</td>
                 </tr>
                 <tr>
-                  <td><strong>供应商门户管理</strong></td>
-                  <td>供应商组织、成员账号、已下采购单、S/N 号段、铭牌/标签批次、扫码记录、备品替换、异常审核、S/N 主档</td>
-                  <td>ERPNext Supplier / Purchase Order + 计划系统 S/N 号段、铭牌/标签批次和扫码事件</td>
-                  <td>S/N 按 PO 行生成并发放；系统同步生成铭牌/标签包，供应商只能扫码自己可见 PO 的 S/N，不绑定排柜计划。</td>
-                  <td>供应商扫码和查看本组织数据；内部维护号段、审核备品、作废异常号</td>
-                  <td>写入 S/N Registry，提供售后有效性查询；异常进入内部审核，不影响海外仓 / FBA 按 UPC 出库。</td>
+                  <td><strong>供应商管理</strong></td>
+                  <td>供应商组织、组织管理员、组织下账号、账号角色、账号状态、最近操作</td>
+                  <td>ERPNext Supplier + 计划系统供应商组织账号表</td>
+                  <td>本页只维护供应商组织和组织下账号；PO、铭牌、扫码和 S/N 生命周期进入 S/N 管理。</td>
+                  <td>内部维护供应商组织和账号；供应商成员登录后只能访问本组织前台。</td>
+                  <td>组织账号同步到 ERPNext 角色边界，扫码记录仍落到具体账号。</td>
                 </tr>
                 <tr>
                   <td><strong>目标销量维护</strong></td>
@@ -4398,14 +4380,14 @@
                   <td>按 PO 数量和备品比例生成原始号段与备品号段，同时输出可打印铭牌/标签包。</td>
                   <td>PO、SKU、供应商、原始 S/N、备品 S/N、UPC、铭牌/标签批次</td>
                   <td>备品比例按规则计算；号段生成后仅允许内部作废、补发或重打铭牌</td>
-                  <td>ERPNext PO -> 供应商门户管理 -> S/N 主档</td>
+                  <td>ERPNext PO -> S/N 管理 -> S/N 主档</td>
                 </tr>
                 <tr>
                   <td>供应商扫码激活 S/N</td>
                   <td>逐次校验 PO 权限、SKU 匹配、号段存在、重复激活、备品启用前置条件。</td>
                   <td>工厂批次、产线工位、扫码人员、扫码时间、扫码状态、失败原因</td>
                   <td>异常行不可直接写入；内部可审核备品替换或作废原始号</td>
-                  <td>供应商门户管理 -> S/N Registry -> 售后查询</td>
+                  <td>S/N 管理 -> S/N Registry -> 售后查询</td>
                 </tr>
               </tbody>
             </table>
@@ -4678,7 +4660,7 @@
       plans: ["排柜计划维护", "批量创建排柜计划草稿、调整出货日期、确认发货、取消/恢复和提交 ERPNext 队列。"],
       purchase: ["采购执行中心", "只管理计划备货同步的采购计划、采购跟单、PO、PO 收货和 PO 开票，不在采购订单中管理交期。"],
       logistics: ["物流中心", "统一管理头程、自发货、物流数据和报关清关；排柜日期由计划备货维护。"],
-      supplierPortal: ["供应商门户管理", "供应商查看已下采购单，下载 PO 铭牌/标签包并扫码激活 S/N；内部处理号段、备品、异常和售后查询。"],
+      supplierPortal: ["供应商管理", "管理供应商组织和组织下账号。"],
       supplierPortalPreview: ["供应商门户预览", "模拟供应商登录后的前台网页，只显示当前供应商自己的 PO、PO 铭牌/标签包、扫码入口和校验结果。"],
       targets: ["目标销量维护", "按本月 + 未来 6 个月滚动窗口维护目标版本，人工值优先生效。"],
       parameters: ["备货参数维护", "维护计划调整、下单间隔、安全库存、物流周期和采购周期；产品等级与清货标记仅查看。"],
@@ -5643,6 +5625,24 @@
       ["Dongguan ComfortTech", "supplier.comfort.admin", "3", "PO-8892", "下载 PO 铭牌 / 扫码激活 / 邀请成员", "成本、销售目标、排柜计划、其他供应商 PO", "-", "邀请中"],
       ["Ningbo Wellness", "supplier.wellness.admin", "5", "PO-8893", "查看历史扫码 / 下载标签清单 / 邀请成员", "成本、销售目标、其他供应商 PO", "Ken Xu 扫码 2026-07-08 16:20", "启用"]
     ];
+    const supplierMemberAccounts = [
+      ["Shenzhen PowerTech", "supplier.powertech.admin", "Amy Chen", "组织管理员", "启用", "扫码 2026-07-09 18:35"],
+      ["Shenzhen PowerTech", "supplier.powertech.line01", "Leo Wang", "产线扫码员", "启用", "扫码 2026-07-09 18:18"],
+      ["Shenzhen PowerTech", "supplier.powertech.line02", "Jason Li", "产线扫码员", "启用", "扫码 2026-07-09 17:42"],
+      ["Shenzhen PowerTech", "supplier.powertech.line03", "Mia Zhou", "产线扫码员", "启用", "扫码 2026-07-09 16:28"],
+      ["Shenzhen PowerTech", "supplier.powertech.qa01", "Grace Xu", "质检查看", "启用", "查看异常 2026-07-09 18:40"],
+      ["Shenzhen PowerTech", "supplier.powertech.viewer01", "Nolan Chen", "只读账号", "启用", "查看记录 2026-07-09 18:52"],
+      ["Shenzhen PowerTech", "supplier.powertech.line04", "Helen Wu", "产线扫码员", "停用", "停用 2026-07-02"],
+      ["Shenzhen PowerTech", "supplier.powertech.line05", "Eric Lin", "产线扫码员", "启用", "扫码 2026-07-08 19:05"],
+      ["Dongguan ComfortTech", "supplier.comfort.admin", "May Chen", "组织管理员", "邀请中", "-"],
+      ["Dongguan ComfortTech", "supplier.comfort.line01", "Mike Li", "产线扫码员", "邀请中", "-"],
+      ["Dongguan ComfortTech", "supplier.comfort.viewer01", "Sunny He", "只读账号", "邀请中", "-"],
+      ["Ningbo Wellness", "supplier.wellness.admin", "Ken Xu", "组织管理员", "启用", "扫码 2026-07-08 16:20"],
+      ["Ningbo Wellness", "supplier.wellness.line01", "Ivy Zhang", "产线扫码员", "启用", "扫码 2026-07-08 15:58"],
+      ["Ningbo Wellness", "supplier.wellness.line02", "Oscar Hu", "产线扫码员", "启用", "扫码 2026-07-08 15:34"],
+      ["Ningbo Wellness", "supplier.wellness.qa01", "Tina Yu", "质检查看", "启用", "查看历史扫码 2026-07-08 16:40"],
+      ["Ningbo Wellness", "supplier.wellness.viewer01", "Alan Ma", "只读账号", "启用", "导出记录 2026-07-08 17:02"]
+    ];
     const supplierPreviewName = "Shenzhen PowerTech";
     let activeSnIssuePo = "PO-8891";
     let activeActionPrimary = null;
@@ -5694,7 +5694,7 @@
     let activeFinanceTab = "应收账款";
     let activeApprovalTab = "审批待办";
     let activeCompanyMenu = "公司账套";
-    let activeSupplierPortalMenu = "PO 管理";
+    let activeSupplierPortalMenu = "组织管理";
     let activeApp = "erpnext";
     let activePlanSavedView = "default";
     const planColumnIndexes = {
@@ -6963,9 +6963,9 @@
         rows = roleRecords.map((row) => `<tr><td><div class="row-title">${row.role}</div></td><td>${row.users}</td><td>${row.companies}</td><td>${row.modules}</td><td>${row.approve}</td><td>${chip(row.status)}</td><td><button class="button small" type="button" data-toast="已打开 ${row.role} 权限详情">查看权限</button></td></tr>`);
         note = "权限不能只按页面控制，还需要公司、仓库、供应商和单据金额范围；供应商门户必须与内部角色完全隔离。";
       } else if (activeApprovalTab === "供应商门户") {
-        headers = ["供应商组织", "组织管理员", "成员数", "可见 PO", "可执行操作", "不可见范围", "最近活动", "状态", "操作"];
-        rows = supplierAccounts.map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td><td>${row[5]}</td><td>${row[6]}</td><td>${chip(row[7])}</td><td><button class="button small" type="button" data-view-jump="supplierPortal">打开门户</button></td></tr>`);
-        note = "供应商门户只暴露本供应商关联 PO、标签包、扫码台和扫码结果，不展示公司利润、其他供应商、销售目标和完整库存。";
+        headers = ["供应商组织", "组织管理员", "成员数", "组织状态", "最近活动", "操作"];
+        rows = supplierAccounts.map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${chip(row[7])}</td><td>${row[6]}</td><td><button class="button small" type="button" data-view-jump="supplierPortal">打开供应商管理</button></td></tr>`);
+        note = "供应商管理只维护供应商组织和组织账号；PO、铭牌、扫码和 S/N 生命周期进入 S/N 管理。";
       } else {
         headers = ["审批流", "触发条件", "审批路径", "SLA", "状态", "操作"];
         rows = approvalFlows.map((row) => `<tr><td><div class="row-title">${row.flow}</div></td><td>${row.trigger}</td><td>${row.route}</td><td>${row.sla}</td><td>${chip(row.status)}</td><td><button class="button small" type="button" data-toast="已打开 ${row.flow} 配置">配置</button></td></tr>`);
@@ -7442,13 +7442,17 @@
       }, 0);
       const uploadErrors = snUploadPreview.filter((row) => row.status === "扫码失败").length;
       const sparePending = snRegistry.filter((row) => row.spare === "是" && row.status === "待审核").length;
-      const supplierMemberTotal = supplierAccounts.reduce((sum, row) => sum + Number(row[2] || 0), 0);
+      const supplierMemberTotal = supplierMemberAccounts.length;
+      const activeSuppliers = supplierAccounts.filter((row) => row[7] === "启用").length;
+      const activeSupplierMembers = supplierMemberAccounts.filter((row) => row[4] === "启用").length;
+      const pendingSupplierInvites = supplierMemberAccounts.filter((row) => row[4] === "邀请中").length;
+      const disabledSupplierMembers = supplierMemberAccounts.filter((row) => row[4] === "停用").length;
       const supplierPortalMetrics = [
-        ["供应商组织", uniqueSuppliers, "组织 + 成员账号隔离", ""],
-        ["门户可见 PO", supplierPurchaseOrders.length, "按供应商隔离", "good"],
-        ["供应商成员", supplierMemberTotal, "组织下成员账号", ""],
-        ["待处理 PO", pendingPo, "待扫码或部分扫码", pendingPo ? "warning" : "good"],
-        ["权限异常", 0, "当前无越权访问", "good"]
+        ["供应商组织", supplierAccounts.length || uniqueSuppliers, "组织主数据", ""],
+        ["启用组织", activeSuppliers, "可登录门户", "good"],
+        ["组织账号", supplierMemberTotal, "组织下成员账号", ""],
+        ["待邀请账号", pendingSupplierInvites, "等待激活", pendingSupplierInvites ? "warning" : "good"],
+        ["停用账号", disabledSupplierMembers, "不可登录", disabledSupplierMembers ? "warning" : "good"]
       ];
       const snMetrics = [
         ["已发放 S/N", money(issuedTotal), "按 PO 生成号段", ""],
@@ -7465,24 +7469,19 @@
         </div>
       `).join("");
 
-      const visiblePortalRows = filteredSupplierPortalPurchaseOrders();
-      document.getElementById("supplierPortalPoRows").innerHTML = visiblePortalRows.length ? visiblePortalRows.map((row) => `
+      document.getElementById("supplierOrgRows").innerHTML = supplierAccounts.map((row) => `
         <tr>
-          <td><div class="row-title">${htmlText(row.supplier)}</div><div class="row-subtitle">组织级数据隔离</div></td>
-          <td><div class="row-title">${htmlText(row.po)}</div><div class="row-subtitle">门户可见</div></td>
-          <td>${htmlText(row.poDate)}</td>
-          <td>${htmlText(row.sku)}</td>
-          <td>${htmlText(row.platformSku)}<div class="row-subtitle">UPC ${htmlText(row.upc)}</div></td>
-          <td>${money(row.qty)}</td>
-          <td>${htmlText(row.labelBatch)}</td>
-          <td>${chip(row.status)}</td>
-          <td>${htmlText(row.lastUpload)}</td>
+          <td><div class="row-title">${htmlText(row[0])}</div><div class="row-subtitle">供应商组织</div></td>
+          <td>${htmlText(row[1])}</td>
+          <td>${htmlText(row[2])}</td>
+          <td>${chip(row[7])}</td>
+          <td>${htmlText(row[6])}</td>
           <td>
-            <button class="button small" type="button" data-view-jump="supplierPortalPreview">门户</button>
-            <button class="button small" type="button" data-supplier-action="sync-permission">权限</button>
+            <button class="button small" type="button" data-toast="已打开 ${htmlAttr(row[0])} 组织详情">组织</button>
+            <button class="button small" type="button" data-supplier-action="invite">邀请账号</button>
           </td>
         </tr>
-      `).join("") : `<tr><td class="empty-row" colspan="10">没有匹配的供应商门户采购单。</td></tr>`;
+      `).join("");
 
       const visibleSupplierRows = filteredSupplierPurchaseOrders();
       document.getElementById("supplierPoRows").innerHTML = visibleSupplierRows.length ? visibleSupplierRows.map((row) => {
@@ -7553,16 +7552,18 @@
         </tr>
       `).join("") : `<tr><td class="empty-row" colspan="15">没有匹配的 S/N 主档记录。</td></tr>`;
 
-      document.getElementById("supplierAccountRows").innerHTML = supplierAccounts.map((row) => `
+      document.getElementById("supplierMemberRows").innerHTML = supplierMemberAccounts.map((row) => `
         <tr>
           <td><div class="row-title">${htmlText(row[0])}</div></td>
           <td>${htmlText(row[1])}</td>
           <td>${htmlText(row[2])}</td>
           <td>${htmlText(row[3])}</td>
-          <td>${htmlText(row[4])}</td>
+          <td>${chip(row[4])}</td>
           <td>${htmlText(row[5])}</td>
-          <td>${htmlText(row[6])}</td>
-          <td>${chip(row[7])}</td>
+          <td>
+            <button class="button small" type="button" data-toast="已打开 ${htmlAttr(row[1])} 账号详情">账号</button>
+            <button class="button small" type="button" data-toast="${row[4] === "停用" ? "已启用账号" : "已停用账号"}">状态</button>
+          </td>
         </tr>
       `).join("");
     }
@@ -7765,7 +7766,7 @@
           title: "协同与管理",
           items: [
             { view: "approvals", label: "权限与审批", description: "多公司、角色、审批、门户", icon: "shield-check" },
-            { view: "supplierPortal", label: "供应商门户", description: "供应商 PO、S/N 标签、扫码异常", icon: "users-round" }
+            { view: "supplierPortal", label: "供应商管理", description: "供应商组织与组织账号", icon: "users-round" }
           ]
         }
       ],
@@ -7794,7 +7795,7 @@
         {
           title: "供应商协同",
           items: [
-            { view: "supplierPortal", label: "供应商门户与 S/N", description: "供应商 PO、标签包、扫码激活、S/N 主档", icon: "users-round" }
+            { view: "supplierPortal", label: "供应商管理与 S/N", description: "供应商组织、组织账号、S/N 主档", icon: "users-round" }
           ]
         }
       ]
@@ -7813,10 +7814,7 @@
         if (activeSupplierPortalMenu === "S/N 主档" || activeSupplierPortalMenu === "扫码激活") {
           return ["S/N 管理", "管理 S/N 生成、铭牌/标签批次、扫码激活、异常、主档追溯和售后查询。"];
         }
-        if (activeSupplierPortalMenu === "账号权限") {
-          return ["供应商门户账号权限", "管理供应商组织、成员邀请、PO 可见范围和字段隔离。"];
-        }
-        return ["供应商门户管理", "管理供应商可见 PO、铭牌/标签包下载、门户预览和提醒扫码。"];
+        return ["供应商管理", "管理供应商组织和组织下账号。"];
       }
       return pageMeta[view] || ["工作区", ""];
     }
@@ -8674,41 +8672,59 @@
         "供应商组织": htmlText(row[0]),
         "组织管理员": htmlText(row[1]),
         "成员数": htmlText(row[2]),
-        "可见 PO": htmlText(row[3]),
         "状态": chip(row[7]),
-        "邀请动作": row[7] === "邀请中" ? "重发邀请" : "邀请成员"
+        "邀请动作": row[7] === "邀请中" ? "重发管理员邀请" : "邀请组织账号"
       }));
       openActionModal({
-        title: "邀请供应商成员",
-        subtitle: "供应商组织管理员可邀请成员，扫码记录会落到具体人员。",
-        body: renderActionTable(["供应商组织", "组织管理员", "成员数", "可见 PO", "状态", "邀请动作"], rows),
+        title: "邀请组织账号",
+        subtitle: "只邀请供应商组织下的管理员、产线扫码员或查看账号。",
+        body: renderActionTable(["供应商组织", "组织管理员", "成员数", "状态", "邀请动作"], rows),
         primaryText: "生成邀请",
         onPrimary: () => {
-          addLog("供应商门户", "邀请供应商成员", "-", "邀请链接已生成");
+          addLog("供应商管理", "邀请组织账号", "-", "邀请链接已生成");
           closeModals();
-          showToast("供应商成员邀请链接已生成");
+          showToast("组织账号邀请链接已生成");
+        }
+      });
+    }
+
+    function openSupplierOrgModal() {
+      openActionModal({
+        title: "新增供应商组织",
+        subtitle: "先创建供应商组织，再为该组织邀请管理员和成员账号。",
+        body: `
+          <div class="form-grid">
+            <label class="field"><span>供应商组织名称</span><input class="input" value="New Supplier Co." /></label>
+            <label class="field"><span>组织管理员账号</span><input class="input" value="supplier.new.admin" /></label>
+            <label class="field"><span>管理员姓名</span><input class="input" value="待填写" /></label>
+            <label class="field"><span>组织状态</span><select class="select"><option>启用</option><option>邀请中</option><option>停用</option></select></label>
+          </div>
+          <div class="notice info" style="margin-top:12px"><i data-lucide="users-round" class="icon"></i><span>该页面只维护供应商组织和组织账号。</span></div>
+        `,
+        primaryText: "保存组织",
+        onPrimary: () => {
+          addLog("供应商管理", "新增供应商组织", "-", "组织草稿已生成");
+          closeModals();
+          showToast("供应商组织草稿已生成");
         }
       });
     }
 
     function openPermissionSyncModal() {
       openActionModal({
-        title: "同步权限",
-        subtitle: "将供应商组织、成员账号、可见 PO 和字段隐藏规则同步到 ERPNext 角色边界。",
-        body: renderActionTable(["供应商组织", "组织管理员", "成员数", "可见 PO", "可操作", "不可见字段", "状态"], supplierAccounts.map((row) => ({
+        title: "同步组织账号",
+        subtitle: "将供应商组织、管理员和组织下账号同步到 ERPNext 角色边界。",
+        body: renderActionTable(["供应商组织", "组织管理员", "成员数", "状态"], supplierAccounts.map((row) => ({
           "供应商组织": htmlText(row[0]),
           "组织管理员": htmlText(row[1]),
           "成员数": htmlText(row[2]),
-          "可见 PO": htmlText(row[3]),
-          "可操作": htmlText(row[4]),
-          "不可见字段": htmlText(row[5]),
           "状态": chip(row[7])
         }))),
         primaryText: "同步到 ERPNext",
         onPrimary: () => {
-          addLog("供应商门户", "同步权限", "-", "ERPNext 角色边界已同步");
+          addLog("供应商管理", "同步组织账号", "-", "ERPNext 角色边界已同步");
           closeModals();
-          showToast("权限边界已同步到 ERPNext 角色");
+          showToast("供应商组织账号已同步");
         }
       });
     }
@@ -8840,6 +8856,7 @@
       if (action === "review-exceptions") return openExceptionReviewModal();
       if (action === "after-sales") return openAfterSalesModal();
       if (action === "invite") return openInviteModal();
+      if (action === "create-org") return openSupplierOrgModal();
       if (action === "sync-permission") return openPermissionSyncModal();
       showToast("该供应商门户动作尚未配置");
     }
