@@ -2527,6 +2527,17 @@
             </button>
           </div>
         </div>
+        <div class="nav-section">
+          <div class="nav-title">供应商协同</div>
+          <div class="nav-list">
+            <button class="nav-item" type="button" data-view="supplierPortal" data-supplier-menu="PO 管理" title="供应商门户管理">
+              <i data-lucide="users-round" class="icon"></i><span>供应商门户管理</span><span class="badge">3</span>
+            </button>
+            <button class="nav-item" type="button" data-view="supplierPortal" data-supplier-menu="S/N 主档" title="S/N 管理">
+              <i data-lucide="scan-barcode" class="icon"></i><span>S/N 管理</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="app-nav" id="legacyPlanningNav" hidden>
@@ -7704,7 +7715,7 @@
       document.getElementById("detailDrawer").classList.remove("open");
     }
 
-    const planningViews = new Set(["workbench", "historySales", "firstAllocation", "secondAllocation", "preCabinet", "plans", "targets", "parameters", "mapping", "sync", "sourceLogic", "overview"]);
+    const planningViews = new Set(["workbench", "historySales", "firstAllocation", "secondAllocation", "preCabinet", "plans", "targets", "parameters", "mapping", "sync", "sourceLogic", "supplierPortal", "supplierPortalPreview", "overview"]);
 
     const workspaceCatalog = {
       erpnext: [
@@ -7755,6 +7766,12 @@
             { view: "mapping", label: "平台 SKU 映射", description: "平台 SKU、ASIN、店铺、仓库", icon: "git-branch" },
             { view: "sync", label: "ERPNext 同步队列", description: "提交、失败、重试、变更日志", icon: "list-checks" },
             { view: "sourceLogic", label: "取值与联动模型", description: "字段来源与编辑边界", icon: "workflow" }
+          ]
+        },
+        {
+          title: "供应商协同",
+          items: [
+            { view: "supplierPortal", label: "供应商门户与 S/N", description: "供应商 PO、标签包、扫码激活、S/N 主档", icon: "users-round" }
           ]
         }
       ]
