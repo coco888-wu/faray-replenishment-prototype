@@ -3889,74 +3889,11 @@
         <section class="panel">
           <div class="panel-header">
             <div>
-              <div class="panel-title">Shenzhen PowerTech 供应商门户</div>
-              <div class="panel-subtitle">供应商登录后只看到本供应商采购单、PO 铭牌/标签包、扫码台、扫码结果和错误原因。</div>
-            </div>
-            <div class="toolbar-right">
-              <button class="button" type="button" data-view-jump="supplierPortal"><i data-lucide="arrow-left" class="icon"></i>返回后台</button>
-              <button class="button" type="button" data-supplier-action="template" data-po="PO-8891"><i data-lucide="printer" class="icon"></i>下载 PO 铭牌</button>
-              <button class="button blue" type="button" data-supplier-action="scan" data-po="PO-8891"><i data-lucide="scan-line" class="icon"></i>扫码激活</button>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="detail-grid" id="supplierPreviewAccess"></div>
-            <div class="notice info" style="margin-top:12px">
-              <i data-lucide="lock-keyhole" class="icon"></i>
-              <span>当前为供应商前台视角：不展示成本、销售目标、其他供应商 PO、全量 S/N 主档和内部审核入口。</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="panel-title">S/N 执行工作区</div>
-              <div class="panel-subtitle">按采购单下载 PO 铭牌/标签包、贴标扫码、查看异常和确认 S/N 生效结果。</div>
-            </div>
-            <span class="chip blue">当前供应商：Shenzhen PowerTech</span>
-          </div>
-          <div class="panel-body">
-            <div class="portal-steps">
-              <div class="portal-step">
-                <span class="portal-step-number">1</span>
-                <strong>采购单</strong>
-                <p>待处理 2 张<br>查看本组织可见 PO</p>
-              </div>
-              <div class="portal-step">
-                <span class="portal-step-number">2</span>
-                <strong>铭牌/标签包</strong>
-                <p>待下载 1 批<br>按 PO 打印后贴附</p>
-              </div>
-              <div class="portal-step">
-                <span class="portal-step-number">3</span>
-                <strong>扫码激活</strong>
-                <p>待扫码 12 个<br>记录人员与产线</p>
-              </div>
-              <div class="portal-step">
-                <span class="portal-step-number">4</span>
-                <strong>异常处理</strong>
-                <p>待处理 1 项<br>查看失败原因</p>
-              </div>
-              <div class="portal-step">
-                <span class="portal-step-number">5</span>
-                <strong>生效结果</strong>
-                <p>已扫码 1,188 个<br>可导出记录</p>
-              </div>
-            </div>
-            <div class="notice info" style="margin-top:12px">
-              <i data-lucide="shield-check" class="icon"></i>
-              <span>供应商只看到本供应商业务；采购成本、其他供应商 PO、目标销量、全量库存与内部审批不可见。</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <div>
               <div class="panel-title">我的采购单</div>
               <div class="panel-subtitle">供应商在每张 PO 行下载铭牌/标签包，再按同一 PO 扫码激活 S/N；不参与排柜计划和海外仓出库扫码。</div>
             </div>
             <div class="toolbar-right">
+              <button class="button small" type="button" data-view-jump="supplierPortal"><i data-lucide="arrow-left" class="icon"></i>返回后台</button>
               <button class="button small" type="button" data-supplier-action="template" data-po="PO-8891">下载 PO 铭牌</button>
               <button class="button small" type="button" data-supplier-action="range" data-po="PO-8891">查看号段</button>
               <button class="button small" type="button" data-supplier-action="scan" data-po="PO-8891">打开扫码台</button>
@@ -7633,12 +7570,6 @@
       const poRows = filteredSupplierPreviewPurchaseOrders();
       const visiblePoSet = new Set(poRows.map((row) => row.po));
       const uploadRows = snUploadPreview.filter((row) => visiblePoSet.has(row.po));
-      document.getElementById("supplierPreviewAccess").innerHTML = [
-        detail("当前账号", "supplier.powertech.admin"),
-        detail("组织成员", "8 人，可邀请产线扫码账号"),
-        detail("数据范围", "仅本供应商采购单、PO 铭牌/标签包与扫码结果"),
-        detail("可执行动作", "下载 PO 铭牌 / 扫码激活 / 查看结果")
-      ].join("");
 
       document.getElementById("supplierPreviewPoRows").innerHTML = poRows.length ? poRows.map((row) => {
         const activatedNormal = Math.min(row.qty, row.activatedSn);
