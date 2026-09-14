@@ -3890,11 +3890,11 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">Shenzhen PowerTech 供应商门户</div>
-              <div class="panel-subtitle">供应商登录后只看到本供应商采购单、标签包、扫码台、扫码结果和错误原因。</div>
+              <div class="panel-subtitle">供应商登录后只看到本供应商采购单、PO 铭牌/标签包、扫码台、扫码结果和错误原因。</div>
             </div>
             <div class="toolbar-right">
               <button class="button" type="button" data-view-jump="supplierPortal"><i data-lucide="arrow-left" class="icon"></i>返回后台</button>
-              <button class="button" type="button" data-supplier-action="template" data-po="PO-8891"><i data-lucide="printer" class="icon"></i>下载标签包</button>
+              <button class="button" type="button" data-supplier-action="template" data-po="PO-8891"><i data-lucide="printer" class="icon"></i>下载 PO 铭牌</button>
               <button class="button blue" type="button" data-supplier-action="scan" data-po="PO-8891"><i data-lucide="scan-line" class="icon"></i>扫码激活</button>
             </div>
           </div>
@@ -3911,7 +3911,7 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">S/N 执行工作区</div>
-              <div class="panel-subtitle">按采购单下载标签包、贴标扫码、查看异常和确认 S/N 生效结果。</div>
+              <div class="panel-subtitle">按采购单下载 PO 铭牌/标签包、贴标扫码、查看异常和确认 S/N 生效结果。</div>
             </div>
             <span class="chip blue">当前供应商：Shenzhen PowerTech</span>
           </div>
@@ -3924,8 +3924,8 @@
               </div>
               <div class="portal-step">
                 <span class="portal-step-number">2</span>
-                <strong>标签包</strong>
-                <p>待打印 1 批<br>随铭牌 / FBA 标签贴附</p>
+                <strong>铭牌/标签包</strong>
+                <p>待下载 1 批<br>按 PO 打印后贴附</p>
               </div>
               <div class="portal-step">
                 <span class="portal-step-number">3</span>
@@ -3954,9 +3954,10 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">我的采购单</div>
-              <div class="panel-subtitle">供应商只处理自己可见 PO 下的标签打印与 S/N 扫码，不参与排柜计划和海外仓出库扫码。</div>
+              <div class="panel-subtitle">供应商在每张 PO 行下载铭牌/标签包，再按同一 PO 扫码激活 S/N；不参与排柜计划和海外仓出库扫码。</div>
             </div>
             <div class="toolbar-right">
+              <button class="button small" type="button" data-supplier-action="template" data-po="PO-8891">下载 PO 铭牌</button>
               <button class="button small" type="button" data-supplier-action="range" data-po="PO-8891">查看号段</button>
               <button class="button small" type="button" data-supplier-action="scan" data-po="PO-8891">打开扫码台</button>
             </div>
@@ -3985,7 +3986,7 @@
                   <th>备品比例</th>
                   <th>备品数量</th>
                   <th>已发放 S/N</th>
-                  <th>标签批次</th>
+                  <th>铭牌/标签批次</th>
                   <th>已扫码 S/N</th>
                   <th>待扫码</th>
                   <th>状态</th>
@@ -4740,8 +4741,8 @@
       plans: ["排柜计划维护", "批量创建排柜计划草稿、调整出货日期、确认发货、取消/恢复和提交 ERPNext 队列。"],
       purchase: ["采购执行中心", "只管理计划备货同步的采购计划、采购跟单、PO、PO 收货和 PO 开票，不在采购订单中管理交期。"],
       logistics: ["物流中心", "统一管理头程、自发货、物流数据和报关清关；排柜日期由计划备货维护。"],
-      supplierPortal: ["供应商门户管理", "供应商查看已下采购单，下载标签包并扫码激活 S/N；内部处理号段、备品、异常和售后查询。"],
-      supplierPortalPreview: ["供应商门户预览", "模拟供应商登录后的前台网页，只显示当前供应商自己的 PO、标签包、扫码入口和校验结果。"],
+      supplierPortal: ["供应商门户管理", "供应商查看已下采购单，下载 PO 铭牌/标签包并扫码激活 S/N；内部处理号段、备品、异常和售后查询。"],
+      supplierPortalPreview: ["供应商门户预览", "模拟供应商登录后的前台网页，只显示当前供应商自己的 PO、PO 铭牌/标签包、扫码入口和校验结果。"],
       targets: ["目标销量维护", "按本月 + 未来 6 个月滚动窗口维护目标版本，人工值优先生效。"],
       parameters: ["备货参数维护", "维护计划调整、下单间隔、安全库存、物流周期和采购周期；产品等级与清货标记仅查看。"],
       mapping: ["平台 SKU 映射管理", "维护平台 SKU、库存 SKU、ASIN、店铺、国家、默认发货仓、产品等级和清货标记。"],
@@ -5701,8 +5702,8 @@
     ];
 
     const supplierAccounts = [
-      ["Shenzhen PowerTech", "supplier.powertech.admin", "8", "PO-8891", "下载标签包 / 扫码激活 / 查看本组织异常 / 邀请成员", "成本、销售目标、其他供应商 PO", "Amy Chen 扫码 2026-07-09 18:35", "启用"],
-      ["Dongguan ComfortTech", "supplier.comfort.admin", "3", "PO-8892", "下载标签包 / 扫码激活 / 邀请成员", "成本、销售目标、排柜计划、其他供应商 PO", "-", "邀请中"],
+      ["Shenzhen PowerTech", "supplier.powertech.admin", "8", "PO-8891", "下载 PO 铭牌 / 扫码激活 / 查看本组织异常 / 邀请成员", "成本、销售目标、其他供应商 PO", "Amy Chen 扫码 2026-07-09 18:35", "启用"],
+      ["Dongguan ComfortTech", "supplier.comfort.admin", "3", "PO-8892", "下载 PO 铭牌 / 扫码激活 / 邀请成员", "成本、销售目标、排柜计划、其他供应商 PO", "-", "邀请中"],
       ["Ningbo Wellness", "supplier.wellness.admin", "5", "PO-8893", "查看历史扫码 / 下载标签清单 / 邀请成员", "成本、销售目标、其他供应商 PO", "Ken Xu 扫码 2026-07-08 16:20", "启用"]
     ];
     const supplierPreviewName = "Shenzhen PowerTech";
@@ -7635,8 +7636,8 @@
       document.getElementById("supplierPreviewAccess").innerHTML = [
         detail("当前账号", "supplier.powertech.admin"),
         detail("组织成员", "8 人，可邀请产线扫码账号"),
-        detail("数据范围", "仅本供应商采购单、标签包与扫码结果"),
-        detail("可执行动作", "下载标签包 / 扫码激活 / 查看结果")
+        detail("数据范围", "仅本供应商采购单、PO 铭牌/标签包与扫码结果"),
+        detail("可执行动作", "下载 PO 铭牌 / 扫码激活 / 查看结果")
       ].join("");
 
       document.getElementById("supplierPreviewPoRows").innerHTML = poRows.length ? poRows.map((row) => {
@@ -7658,7 +7659,7 @@
             <td>${chip(row.status)}</td>
             <td>${htmlText(row.lastUpload)}</td>
             <td>
-              <button class="button small" type="button" data-supplier-action="template" data-po="${htmlAttr(row.po)}">标签</button>
+              <button class="button small" type="button" data-supplier-action="template" data-po="${htmlAttr(row.po)}">下载铭牌</button>
               <button class="button small" type="button" data-supplier-action="scan" data-po="${htmlAttr(row.po)}">扫码</button>
               <button class="button small" type="button" data-supplier-action="record" data-po="${htmlAttr(row.po)}">记录</button>
             </td>
@@ -8571,24 +8572,24 @@
       const row = supplierPoByNo(po);
       const body = `
         <div class="detail-grid">
-          ${detail("标签批次", htmlText(row.labelBatch))}
-          ${detail("标签包名称", `${htmlText(row.po)}_${htmlText(row.labelBatch)}_SN_Labels.pdf`)}
+          ${detail("铭牌批次", htmlText(row.labelBatch))}
+          ${detail("铭牌/标签包文件", `${htmlText(row.po)}_${htmlText(row.labelBatch)}_SN_Nameplate.pdf`)}
           ${detail("供应商", htmlText(row.supplier))}
           ${detail("适用 PO", htmlText(row.po))}
-          ${detail("标签内容", "S/N / SKU / UPC / PO / 二维码")}
-          ${detail("打印方式", "随产品铭牌或 FBA 标签批量打印")}
+          ${detail("铭牌内容", "S/N / SKU / UPC / PO / 二维码")}
+          ${detail("打印方式", "按 PO 下载后随产品铭牌或 FBA 标签批量打印")}
           ${detail("扫码策略", "供应商贴标后逐台扫码，系统校验号段和权限")}
         </div>
-        <div class="notice info" style="margin-top:12px"><i data-lucide="printer" class="icon"></i><span>原型中模拟下载标签包；正式系统会把 S/N 合并到现有产品铭牌 / FBA 标签，减少供应商额外贴标成本。</span></div>
+        <div class="notice info" style="margin-top:12px"><i data-lucide="printer" class="icon"></i><span>原型中模拟下载 PO 铭牌/标签包；正式系统会把 S/N 合并到现有产品铭牌 / FBA 标签，供应商按 PO 下载后打印贴附。</span></div>
       `;
       openActionModal({
-        title: `${row.po} 标签包`,
-        subtitle: "供应商只能下载自己可见 PO 的 S/N 标签包。",
+        title: `${row.po} 铭牌/标签包`,
+        subtitle: "供应商只能下载自己可见 PO 的铭牌/标签包。",
         body,
-        primaryText: "模拟下载标签包",
+        primaryText: "模拟下载铭牌/标签包",
         onPrimary: () => {
           closeModals();
-          showToast(`${row.po} S/N 标签包已生成`);
+          showToast(`${row.po} 铭牌/标签包已生成`);
         }
       });
     }
