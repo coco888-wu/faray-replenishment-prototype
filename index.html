@@ -3821,7 +3821,7 @@
           <div class="panel-header">
             <div>
               <div class="panel-title">组织下账号管理</div>
-              <div class="panel-subtitle">维护供应商组织下的管理员、产线扫码员和查看账号；每次扫码记录到具体账号。</div>
+              <div class="panel-subtitle">维护供应商组织下的 admin 和 member 账号；每次扫码记录到具体账号。</div>
             </div>
             <div class="toolbar-right">
               <button class="button small" type="button" data-supplier-action="invite">邀请账号</button>
@@ -4243,7 +4243,7 @@
                 </tr>
                 <tr>
                   <td><strong>供应商管理</strong></td>
-                  <td>供应商组织、组织管理员、组织下账号、账号角色、账号状态、最近操作</td>
+                  <td>供应商组织、组织管理员、组织下账号、账号角色（admin / member）、账号状态、最近操作</td>
                   <td>ERPNext Supplier + 计划系统供应商组织账号表</td>
                   <td>本页只维护供应商组织和组织下账号；PO、铭牌、扫码和 S/N 生命周期进入 S/N 管理。</td>
                   <td>内部维护供应商组织和账号；供应商成员登录后只能访问本组织前台。</td>
@@ -5605,22 +5605,22 @@
       ["Ningbo Wellness", "supplier.wellness.admin", "5", "PO-8893", "查看历史扫码 / 下载标签清单 / 邀请成员", "成本、销售目标、其他供应商 PO", "Ken Xu 扫码 2026-07-08 16:20", "启用"]
     ];
     const supplierMemberAccounts = [
-      ["Shenzhen PowerTech", "supplier.powertech.admin", "Amy Chen", "组织管理员", "启用", "扫码 2026-07-09 18:35"],
-      ["Shenzhen PowerTech", "supplier.powertech.line01", "Leo Wang", "产线扫码员", "启用", "扫码 2026-07-09 18:18"],
-      ["Shenzhen PowerTech", "supplier.powertech.line02", "Jason Li", "产线扫码员", "启用", "扫码 2026-07-09 17:42"],
-      ["Shenzhen PowerTech", "supplier.powertech.line03", "Mia Zhou", "产线扫码员", "启用", "扫码 2026-07-09 16:28"],
-      ["Shenzhen PowerTech", "supplier.powertech.qa01", "Grace Xu", "质检查看", "启用", "查看异常 2026-07-09 18:40"],
-      ["Shenzhen PowerTech", "supplier.powertech.viewer01", "Nolan Chen", "只读账号", "启用", "查看记录 2026-07-09 18:52"],
-      ["Shenzhen PowerTech", "supplier.powertech.line04", "Helen Wu", "产线扫码员", "停用", "停用 2026-07-02"],
-      ["Shenzhen PowerTech", "supplier.powertech.line05", "Eric Lin", "产线扫码员", "启用", "扫码 2026-07-08 19:05"],
-      ["Dongguan ComfortTech", "supplier.comfort.admin", "May Chen", "组织管理员", "邀请中", "-"],
-      ["Dongguan ComfortTech", "supplier.comfort.line01", "Mike Li", "产线扫码员", "邀请中", "-"],
-      ["Dongguan ComfortTech", "supplier.comfort.viewer01", "Sunny He", "只读账号", "邀请中", "-"],
-      ["Ningbo Wellness", "supplier.wellness.admin", "Ken Xu", "组织管理员", "启用", "扫码 2026-07-08 16:20"],
-      ["Ningbo Wellness", "supplier.wellness.line01", "Ivy Zhang", "产线扫码员", "启用", "扫码 2026-07-08 15:58"],
-      ["Ningbo Wellness", "supplier.wellness.line02", "Oscar Hu", "产线扫码员", "启用", "扫码 2026-07-08 15:34"],
-      ["Ningbo Wellness", "supplier.wellness.qa01", "Tina Yu", "质检查看", "启用", "查看历史扫码 2026-07-08 16:40"],
-      ["Ningbo Wellness", "supplier.wellness.viewer01", "Alan Ma", "只读账号", "启用", "导出记录 2026-07-08 17:02"]
+      ["Shenzhen PowerTech", "supplier.powertech.admin", "Amy Chen", "admin", "启用", "扫码 2026-07-09 18:35"],
+      ["Shenzhen PowerTech", "supplier.powertech.line01", "Leo Wang", "member", "启用", "扫码 2026-07-09 18:18"],
+      ["Shenzhen PowerTech", "supplier.powertech.line02", "Jason Li", "member", "启用", "扫码 2026-07-09 17:42"],
+      ["Shenzhen PowerTech", "supplier.powertech.line03", "Mia Zhou", "member", "启用", "扫码 2026-07-09 16:28"],
+      ["Shenzhen PowerTech", "supplier.powertech.qa01", "Grace Xu", "member", "启用", "查看异常 2026-07-09 18:40"],
+      ["Shenzhen PowerTech", "supplier.powertech.viewer01", "Nolan Chen", "member", "启用", "查看记录 2026-07-09 18:52"],
+      ["Shenzhen PowerTech", "supplier.powertech.line04", "Helen Wu", "member", "停用", "停用 2026-07-02"],
+      ["Shenzhen PowerTech", "supplier.powertech.line05", "Eric Lin", "member", "启用", "扫码 2026-07-08 19:05"],
+      ["Dongguan ComfortTech", "supplier.comfort.admin", "May Chen", "admin", "邀请中", "-"],
+      ["Dongguan ComfortTech", "supplier.comfort.line01", "Mike Li", "member", "邀请中", "-"],
+      ["Dongguan ComfortTech", "supplier.comfort.viewer01", "Sunny He", "member", "邀请中", "-"],
+      ["Ningbo Wellness", "supplier.wellness.admin", "Ken Xu", "admin", "启用", "扫码 2026-07-08 16:20"],
+      ["Ningbo Wellness", "supplier.wellness.line01", "Ivy Zhang", "member", "启用", "扫码 2026-07-08 15:58"],
+      ["Ningbo Wellness", "supplier.wellness.line02", "Oscar Hu", "member", "启用", "扫码 2026-07-08 15:34"],
+      ["Ningbo Wellness", "supplier.wellness.qa01", "Tina Yu", "member", "启用", "查看历史扫码 2026-07-08 16:40"],
+      ["Ningbo Wellness", "supplier.wellness.viewer01", "Alan Ma", "member", "启用", "导出记录 2026-07-08 17:02"]
     ];
     const supplierPreviewName = "Shenzhen PowerTech";
     let activeSnIssuePo = "PO-8891";
@@ -8655,7 +8655,7 @@
       }));
       openActionModal({
         title: "邀请组织账号",
-        subtitle: "只邀请供应商组织下的管理员、产线扫码员或查看账号。",
+        subtitle: "只邀请供应商组织下的 admin 或 member 账号。",
         body: renderActionTable(["供应商组织", "组织管理员", "成员数", "状态", "邀请动作"], rows),
         primaryText: "生成邀请",
         onPrimary: () => {
